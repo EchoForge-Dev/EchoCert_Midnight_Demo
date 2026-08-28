@@ -415,30 +415,57 @@ async function prove() {
 
 async function readChain() {
   const box = $("chain-out");
-  const query = `query($a: HexEncoded!) { contractAction(address: $a) { __typename address } }`;
+  const add = (l, v) => {
+    const r = document.createElement("div");
+    r.className = "out-row";
+    r.innerHTML = `<span class="label-tech">${l}</span><span class="mono-code">${v}</span>`;
+    box.appendChild(r);
+  };
   const t0 = performance.now();
   try {
-    const res = await fetch(indexer, {
+    if (mode === "LIVE") {
+      // The prover told us which network it is on; ask that network's indexer
+      // for the contract itself.
+      const query = `query($a: HexEncoded!) { contractAction(address: $a) { __typename address } }`;
+      const res = await fetch(indexer, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ query, variables: { a: contractAddress ?? RECORDED.contractAddress } }),
+      });
+      const json = await res.json();
+      const ms = (performance.now() - t0).toFixed(0);
+      box.innerHTML = "";
+      add("QUERY", "contractAction(address) — indexer over plain HTTP, no wallet");
+      add("NETWORK", liveNetwork === "undeployed" ? "local devnet" : liveNetwork);
+      add("ROUND TRIP", ms + " ms");
+      const action = json?.data?.contractAction;
+      add("CONTRACT FOUND", action ? action.address : "not on this network");
+      add("COMMITMENT ON CHAIN", "absent — the tree stores a hash of it, never the value");
+      add("LINKABLE TO A HOLDER", "no — measured, see the unlinkability experiment");
+      return;
+    }
+
+    // REPLAY: the demo contract runs on a local devnet, which the public
+    // internet cannot reach. Rather than query a public network for a contract
+    // that is not there and print "not found", do one honest live thing —
+    // fetch the public preprod indexer's chain tip, so the round trip and the
+    // block height are real — and label everything recorded as recorded.
+    const res = await fetch(INDEXERS.preprod, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query, variables: { a: contractAddress ?? RECORDED.contractAddress } }),
+      body: JSON.stringify({ query: `{ block { height } }` }),
     });
     const json = await res.json();
     const ms = (performance.now() - t0).toFixed(0);
     box.innerHTML = "";
-    const add = (l, v) => {
-      const r = document.createElement("div");
-      r.className = "out-row";
-      r.innerHTML = `<span class="label-tech">${l}</span><span class="mono-code">${v}</span>`;
-      box.appendChild(r);
-    };
-    add("QUERY", "contractAction(address) — indexer over plain HTTP, no wallet");
-    add("NETWORK", mode === "LIVE" ? liveNetwork : "preprod");
-    add("ROUND TRIP", ms + " ms");
-    const action = json?.data?.contractAction;
-    add("CONTRACT FOUND", action ? action.address : "not on this network yet");
+    add("LIVE QUERY", "block { height } — public preprod indexer over plain HTTP, no wallet");
+    add("ROUND TRIP", ms + " ms — live, just now");
+    add("PREPROD TIP", json?.data?.block?.height != null ? `block ${json.data.block.height}` : "unavailable");
+    add("THIS CONTRACT", "runs on a local devnet — not deployed on preprod. Run the repo and this page goes LIVE.");
+    add("RECORDED CONTRACT", RECORDED.contractAddress);
+    add("RECORDED READ", "7 ms, wallet-less, against the devnet indexer");
     add("COMMITMENT ON CHAIN", "absent — the tree stores a hash of it, never the value");
-    add("LINKABLE TO A HOLDER", "no");
+    add("LINKABLE TO A HOLDER", "no — measured, see the unlinkability experiment");
   } catch (e) {
     box.innerHTML = `<p class="mono-code">Indexer unreachable: ${e.message}</p>`;
   }
@@ -461,6 +488,7 @@ async function detectMode() {
     }
   } catch { /* no local prover — the deployed page always lands here */ }
   mode = "REPLAY";
+  $("network-badge").textContent = "LOCAL DEVNET · RECORDED";
   $("mode-badge").innerHTML = '<span class="dot replay"></span><span>REPLAY</span>';
 }
 
