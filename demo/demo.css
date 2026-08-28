@@ -170,3 +170,16 @@ header {
 
 .hint { font-size: 11px; color: var(--text-secondary); margin-top: 10px; }
 a { color: var(--text-primary); }
+
+/* --- the three verifiers ------------------------------------------------- */
+
+.verifiers { display: grid; gap: 2px; margin: 16px 0 4px; }
+.verifier {
+  display: grid; grid-template-columns: 220px 1fr auto; gap: 14px; align-items: center;
+  padding: 11px 12px; background: rgba(255,255,255,0.02);
+}
+@media (max-width: 640px) { .verifier { grid-template-columns: 1fr; } }
+.verifier .tx { font-size: 12px; color: var(--text-secondary); word-break: break-all; }
+.verifier .mark { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+.verifier.done .mark { color: var(--success); }
+.verifier.working .mark { color: var(--text-primary); animation: breathe 1.4s ease-in-out infinite; }

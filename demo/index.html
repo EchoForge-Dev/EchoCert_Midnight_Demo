@@ -19,6 +19,7 @@
     </div>
     <div class="spacer"></div>
     <span class="badge" id="network-badge">PREPROD</span>
+    <button class="badge" id="btn-mute" style="cursor:pointer;font-family:inherit;background:transparent;">SOUND ON</button>
     <span class="badge" id="mode-badge"><span class="dot replay"></span><span id="mode-text">CHECKING…</span></span>
   </header>
 
@@ -94,10 +95,30 @@
     </div>
   </section>
 
-  <!-- [04] verify + live chain -->
+  <!-- [04] the unlinkability demonstration — the claim you can actually watch -->
   <section class="section">
     <div class="section-head">
       <span class="section-num">[ 04 ]</span>
+      <span class="label-tech">THREE VERIFIERS · NONE OF THEM CAN TELL</span>
+      <span class="section-rule"></span>
+    </div>
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <p class="cred-note">Chuck applies to three universities and proves the same degree to each.
+        Three separate proofs, three separate transactions. Nothing in them ties the three together.</p>
+      <div class="verifiers" id="verifiers"></div>
+      <div class="btn-row">
+        <button class="btn" id="btn-three">Prove to all three</button>
+      </div>
+      <div class="out" id="link-out"></div>
+    </div>
+  </section>
+
+  <!-- [05] verify + live chain -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">[ 05 ]</span>
       <span class="label-tech">WHAT THE CHAIN ACTUALLY SHOWS</span>
       <span class="section-rule"></span>
     </div>

@@ -145,7 +145,21 @@ async function main() {
       );
     } catch { /* a missed heartbeat is not worth failing over */ }
   }, 60_000);
-  const state: any = await timed("wait for synced state", () => wallet.wallet.waitForSyncedState());
+  // Waiting on waitForSyncedState() means waiting on the shielded wallet, which
+  // is the slowest of the three and the one that grows the heap. This contract
+  // never touches shielded coins — fees are paid in DUST, which is derived from
+  // registered unshielded NIGHT. So wait for the two that actually matter and
+  // start transacting as soon as they are ready.
+  const state: any = await timed("wait for unshielded + dust to be spendable", async () => {
+    for (;;) {
+      const s: any = await Rx.firstValueFrom(wallet.wallet.state().pipe(Rx.take(1)));
+      const unshieldedReady = s.unshielded?.progress?.isStrictlyComplete?.() === true;
+      const dust: bigint = s.dust?.balance?.(new Date()) ?? 0n;
+      const coins: number = s.dust?.availableCoins?.length ?? 0;
+      if (unshieldedReady && dust > 0n && coins >= 1) return s;
+      await new Promise((r) => setTimeout(r, 5_000));
+    }
+  });
   clearInterval(beat);
   const dust: bigint = state.dust?.balance?.(new Date()) ?? 0n;
   const coins: number = state.dust?.availableCoins?.length ?? 0;

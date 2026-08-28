@@ -58,6 +58,34 @@ const FIELDS = [
 
 const FORGED_DEGREE = "PhD Astrophysics";
 
+// --- sound ----------------------------------------------------------------
+//
+// Kenney's CC0 UI pack, mapped to the privacy grammar rather than decorating
+// clicks: closing a field down to LOCAL and opening one up to DISCLOSED are
+// different sounds, because they are opposite moves across a privacy boundary.
+// Quiet by default, and muteable — a judge may well be watching in a library.
+
+const SFX = {
+  redact: "../kenney/Audio/switch2.ogg",
+  reveal: "../kenney/Audio/switch3.ogg",
+  press: "../kenney/Audio/click1.ogg",
+  ok: "../kenney/Audio/switch7.ogg",
+  fail: "../kenney/Audio/switch32.ogg",
+};
+const audio = {};
+let muted = false;
+try { muted = localStorage.getItem("echocert-muted") === "1"; } catch { /* private window */ }
+
+function play(name) {
+  if (muted) return;
+  try {
+    let a = audio[name];
+    if (!a) { a = audio[name] = new Audio(SFX[name]); a.volume = 0.28; }
+    a.currentTime = 0;
+    a.play().catch(() => { /* autoplay policy — the page works silently */ });
+  } catch { /* audio is a nicety, never a dependency */ }
+}
+
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -86,6 +114,7 @@ function renderCredential() {
     row.addEventListener("click", () => {
       if (busy) return;
       f.redacted = !f.redacted;
+      play(f.redacted ? "redact" : "reveal");
       renderCredential();
     });
     grid.appendChild(row);
@@ -152,6 +181,7 @@ async function prove() {
     await sleep(20);
     const ms = stop();
     setState(`FAILED: path does not correspond to this credential`, "failed", ms.toFixed(0) + "ms");
+    play("fail");
     outRow("REJECTED BY", "your own device");
     outRow("REACHED THE NETWORK", "no — the circuit refused to produce a proof");
     outRow("WHY", "the Merkle path proves a commitment this credential does not hash to");
@@ -197,6 +227,7 @@ async function prove() {
   const finalMs = stopFinal();
 
   setState("CONFIRMED", "confirmed", ((proveMs + finalMs) / 1000).toFixed(1) + "s");
+  play("ok");
   outRow("TRANSACTION", result.proveTxId ?? RECORDED.proveTxId);
   outRow("CONTRACT", result.contractAddress ?? RECORDED.contractAddress);
   const verdict = document.createElement("p");
@@ -266,11 +297,12 @@ async function detectMode() {
 
 // --- boot ------------------------------------------------------------------
 
-$("btn-prove").addEventListener("click", () => prove().catch((e) => {
+$("btn-prove").addEventListener("click", () => { play("press"); return prove().catch((e) => {
   setState("FAILED: " + e.message, "failed");
+  play("fail");
   busy = false;
   renderCredential();
-}));
+}); });
 $("btn-forge").addEventListener("click", () => {
   forging = !forging;
   $("btn-forge").textContent = forging ? "Back to the real diploma" : "Try it with a forged diploma";
@@ -291,6 +323,100 @@ $("btn-reset").addEventListener("click", () => {
   renderCredential();
 });
 
+const muteBtn = $("btn-mute");
+const paintMute = () => { muteBtn.textContent = muted ? "SOUND OFF" : "SOUND ON"; };
+muteBtn.addEventListener("click", () => {
+  muted = !muted;
+  try { localStorage.setItem("echocert-muted", muted ? "1" : "0"); } catch { /* ignore */ }
+  paintMute();
+  if (!muted) play("press");
+});
+paintMute();
+
 renderCredential();
 setState("DRAFT", null);
 detectMode().then(readChain);
+
+
+// --- the three verifiers ---------------------------------------------------
+//
+// Unlinkability is the one claim that cannot be shown by looking at a single
+// proof. So prove the same field three times to three different verifiers and
+// put the three transactions side by side: nothing in them is shared.
+
+const VERIFIERS = ["Midnight University", "Cardano University", "EchoForge University"];
+
+// Three real proveDegree transactions from one holder, recorded on the local
+// devnet. Different transactions, same holder, no shared identifier.
+const RECORDED_THREE = [
+  "00387dfdbf2ccff3c2b05ce41b9d5be3cf519fe19e244399e71e1bbf8dbeb5073a",
+  "004c2e36cf30edbaf69ca09374a36f334b6d37f3c2548c49822baaf2ab8fef964f",
+  "001d9748363a5de22ba914572cb373e6d9f351600ab5d16a46bee1f0a8bd0ba066",
+];
+
+function renderVerifiers(rows) {
+  const box = $("verifiers");
+  box.innerHTML = "";
+  VERIFIERS.forEach((name, i) => {
+    const r = rows[i] ?? {};
+    const el = document.createElement("div");
+    el.className = "verifier" + (r.state ? " " + r.state : "");
+    el.innerHTML = `
+      <span class="label-tech">${name.toUpperCase()}</span>
+      <span class="tx">${r.tx ? r.tx : r.state === "working" ? "proving…" : "—"}</span>
+      <span class="mark">${r.state === "done" ? "✓ BSc Computer Science" : r.state === "working" ? "PROVING" : "waiting"}</span>`;
+    box.appendChild(el);
+  });
+}
+
+async function proveToAll() {
+  if (busy) return;
+  busy = true;
+  $("btn-three").disabled = true;
+  $("link-out").innerHTML = "";
+  const rows = VERIFIERS.map(() => ({}));
+  renderVerifiers(rows);
+
+  for (let i = 0; i < VERIFIERS.length; i++) {
+    rows[i] = { state: "working" };
+    renderVerifiers(rows);
+    let tx;
+    if (mode === "LIVE") {
+      const res = await fetch(`${PROVER_URL}/prove`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ field: "DEGREE" }),
+      });
+      tx = (await res.json()).proveTxId;
+    } else {
+      await sleep(2600);
+      tx = RECORDED_THREE[i];
+    }
+    rows[i] = { state: "done", tx };
+    play("ok");
+    renderVerifiers(rows);
+  }
+
+  const txs = rows.map((r) => r.tx);
+  const add = (l, v, cls = "mono-code") => {
+    const el = document.createElement("div");
+    el.className = "out-row";
+    el.innerHTML = `<span class="label-tech">${l}</span><span class="${cls}">${v}</span>`;
+    $("link-out").appendChild(el);
+  };
+  add("TRANSACTIONS", `${new Set(txs).size} distinct`);
+  add("SHARED IDENTIFIER", "none — no commitment, no nullifier, no address in common");
+  add("WHAT EACH SAW", "BSc Computer Science, and nothing else");
+  add("CAN THEY COMPARE NOTES", "yes — and still cannot tell it was one applicant");
+
+  busy = false;
+  $("btn-three").disabled = false;
+  renderVerifiers(rows);
+}
+
+$("btn-three").addEventListener("click", () => { play("press"); return proveToAll().catch((e) => {
+  busy = false;
+  $("btn-three").disabled = false;
+  console.error(e);
+}); });
+renderVerifiers([{}, {}, {}]);

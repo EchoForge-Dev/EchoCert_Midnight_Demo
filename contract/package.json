@@ -8,7 +8,8 @@
     "test": "tsx test/run.ts",
     "e2e": "tsx e2e/devnet.ts",
     "e2e:preprod": "tsx e2e/preprod.ts",
-    "prover": "tsx e2e/prover-service.ts"
+    "prover": "tsx e2e/prover-service.ts",
+    "unlinkability": "tsx e2e/unlinkability.ts"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",
