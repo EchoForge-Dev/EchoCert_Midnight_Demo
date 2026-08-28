@@ -164,9 +164,15 @@ async function main() {
     initialPrivateState: createPrivateState({ held }),
   } as any);
 
+  // The deployed page (https, public origin) probes this loopback service to
+  // decide LIVE vs REPLAY. Chrome's Private Network Access rules only let a
+  // public page reach localhost if the local server opts in with the
+  // allow-private-network header on the preflight — so "run the repo and the
+  // deployed page goes live" holds.
   const cors = {
     "access-control-allow-origin": "*",
     "access-control-allow-headers": "content-type",
+    "access-control-allow-private-network": "true",
     "content-type": "application/json",
   };
 
