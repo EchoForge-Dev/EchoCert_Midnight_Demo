@@ -23,7 +23,7 @@ import { WebSocket } from "ws";
 globalThis.WebSocket = WebSocket;
 
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as Rx from "rxjs";
 
@@ -163,7 +163,9 @@ async function main() {
 }
 
 // Only run the sync loop when invoked directly, so e2e scripts can import
-// buildOrRestoreFacade without starting anything.
-if (process.argv[1] && import.meta.url.endsWith(process.argv[1].split("/").pop()!)) {
+// buildOrRestoreFacade without starting anything. Compare full resolved paths:
+// an endsWith("preprod.ts") check matched e2e/preprod.ts too, which started a
+// second sync inside the E2E process and process.exit(0)'d it mid-deploy.
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   main().catch((e) => { console.error("[sync] FATAL:", e); process.exit(1); });
 }
