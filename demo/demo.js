@@ -14,7 +14,14 @@
 // plain HTTP, which needs no wallet and no secrets.
 
 const PROVER_URL = "http://localhost:8787";
-const INDEXER = "https://indexer.preprod.midnight.network/api/v4/graphql";
+const INDEXERS = {
+  preprod: "https://indexer.preprod.midnight.network/api/v4/graphql",
+  undeployed: "http://127.0.0.1:8088/api/v4/graphql",
+};
+// Replaced at boot by whatever network the live prover reports, so the chain
+// panel always reads the chain the proof actually landed on.
+let indexer = INDEXERS.preprod;
+let contractAddress = null;
 
 // Measured on a real run — replayed, never invented. Replaced with the preprod
 // figures once the contract is deployed there.
@@ -44,6 +51,7 @@ const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let mode = "REPLAY";
+let liveNetwork = "undeployed";
 let forging = false;
 let busy = false;
 
@@ -158,7 +166,9 @@ async function prove() {
   setState("SUBMITTED", null, (proveMs / 1000).toFixed(1) + "s");
   outRow("DISCLOSED FIELD", field.key);
   outRow("DISCLOSED VALUE", result.disclosed ?? RECORDED.disclosed);
-  outRow("PROOF TIME", (proveMs / 1000).toFixed(1) + "s");
+  // In LIVE mode one call covers prove, balance, submit and finalize, so this
+  // is the whole pipeline — not the proving step alone.
+  outRow(mode === "LIVE" ? "PROVE → ON CHAIN" : "PROOF TIME", (proveMs / 1000).toFixed(1) + "s");
 
   // Landing on chain is the slow part; the design system says show it honestly.
   setState("SUBMITTED", null);
@@ -188,10 +198,10 @@ async function readChain() {
   const query = `query($a: HexEncoded!) { contractAction(address: $a) { __typename address } }`;
   const t0 = performance.now();
   try {
-    const res = await fetch(INDEXER, {
+    const res = await fetch(indexer, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query, variables: { a: RECORDED.contractAddress } }),
+      body: JSON.stringify({ query, variables: { a: contractAddress ?? RECORDED.contractAddress } }),
     });
     const json = await res.json();
     const ms = (performance.now() - t0).toFixed(0);
@@ -202,7 +212,8 @@ async function readChain() {
       r.innerHTML = `<span class="label-tech">${l}</span><span class="mono-code">${v}</span>`;
       box.appendChild(r);
     };
-    add("QUERY", "contractAction(address) — public indexer, no wallet");
+    add("QUERY", "contractAction(address) — indexer over plain HTTP, no wallet");
+    add("NETWORK", mode === "LIVE" ? liveNetwork : "preprod");
     add("ROUND TRIP", ms + " ms");
     const action = json?.data?.contractAction;
     add("CONTRACT FOUND", action ? action.address : "not on this network yet");
@@ -219,7 +230,12 @@ async function detectMode() {
   try {
     const res = await fetch(`${PROVER_URL}/health`, { signal: AbortSignal.timeout(1200) });
     if (res.ok) {
+      const health = await res.json();
       mode = "LIVE";
+      liveNetwork = health.network ?? "undeployed";
+      indexer = INDEXERS[liveNetwork] ?? indexer;
+      contractAddress = health.contractAddress ?? null;
+      $("network-badge").textContent = liveNetwork === "undeployed" ? "LOCAL DEVNET" : liveNetwork.toUpperCase();
       $("mode-badge").innerHTML = '<span class="dot live"></span><span>LIVE PROVING</span>';
       return;
     }
@@ -257,5 +273,4 @@ $("btn-reset").addEventListener("click", () => {
 
 renderCredential();
 setState("DRAFT", null);
-detectMode();
-readChain();
+detectMode().then(readChain);

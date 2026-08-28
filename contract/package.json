@@ -7,7 +7,8 @@
     "build:fast": "compact compile --skip-zk src/echocert.compact build",
     "test": "tsx test/run.ts",
     "e2e": "tsx e2e/devnet.ts",
-    "e2e:preprod": "tsx e2e/preprod.ts"
+    "e2e:preprod": "tsx e2e/preprod.ts",
+    "prover": "tsx e2e/prover-service.ts"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",
