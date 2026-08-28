@@ -40,7 +40,8 @@ if (!SEED) { console.error("MIDNIGHT_WALLET_SEED is not set"); process.exit(1); 
 // fileURLToPath, not .pathname — the repo path contains a space, and pathname
 // would hand back %20, silently checkpointing into a wrong directory.
 const STATE_DIR = fileURLToPath(new URL("./.wallet-state-preprod/", import.meta.url));
-const CHECKPOINT_MS = 90_000;
+// 40s, not 90 — a save costs 15ms and every crash loses at most one interval.
+const CHECKPOINT_MS = 40_000;
 const READY_FLAG = join(STATE_DIR, "READY");
 
 // Mirrors testkit's mapEnvironmentToConfiguration for the preprod endpoints.
@@ -141,7 +142,15 @@ async function main() {
     const dust: bigint = s.dust?.balance?.(new Date()) ?? 0n;
     const coins: number = s.dust?.availableCoins?.length ?? 0;
     const heapMB = Math.round(process.memoryUsage().heapUsed / 1048576);
-    console.log(`[sync] +${((Date.now() - t0) / 60000).toFixed(1)}min shielded=${sh} unshielded=${un} dust=${du} DUST=${dust} coins=${coins} heap=${heapMB}MB`);
+    // appliedIndex/highestIndex make cross-attempt progress visible — the whole
+    // point of checkpointing is that these keep climbing across crashes.
+    const dp: any = s.dust?.state?.progress ?? {};
+    const up: any = s.unshielded?.progress ?? {};
+    console.log(
+      `[sync] +${((Date.now() - t0) / 60000).toFixed(1)}min shielded=${sh} unshielded=${un} dust=${du} ` +
+      `dustIdx=${dp.appliedIndex ?? "?"}/${dp.highestIndex ?? "?"} unIdx=${up.appliedIndex ?? "?"}/${up.highestIndex ?? "?"} ` +
+      `DUST=${dust} coins=${coins} heap=${heapMB}MB`,
+    );
 
     if (un && du && dust > 0n && coins >= 1) {
       clearInterval(ckptTimer);

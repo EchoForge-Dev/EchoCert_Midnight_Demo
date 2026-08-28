@@ -6,7 +6,7 @@ READY="e2e/.wallet-state-preprod/READY"
 rm -f "$READY"
 for attempt in $(seq 1 60); do
   echo "[loop] attempt $attempt $(date '+%H:%M:%S')"
-  NODE_OPTIONS="--max-old-space-size=8192" npx tsx e2e/sync-preprod.ts
+  NODE_OPTIONS="--max-old-space-size=12288" npx tsx e2e/sync-preprod.ts
   code=$?
   [ -f "$READY" ] && { echo "[loop] READY after $attempt attempt(s)"; exit 0; }
   echo "[loop] exited with $code, no READY — restarting from checkpoints in 5s"
