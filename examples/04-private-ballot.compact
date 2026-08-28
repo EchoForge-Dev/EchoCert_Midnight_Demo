@@ -1,0 +1,61 @@
+pragma language_version 0.23;
+import CompactStandardLibrary;
+
+// EXAMPLE 04 — PRIVATE BALLOT (EchoVote direction)
+// A yes/no ballot. The tally is public; voter identities are not.
+// Each voter's secret derives a one-time nullifier that prevents double
+// voting without linking the vote to any address.
+//
+// Honest scope note: the *direction* of a vote is visible per-transaction
+// (which counter changed), but *who* cast it is not. Hiding the direction
+// too requires commit-reveal aggregation — out of scope for an example.
+//
+// Teaches: enum state machine, nullifier pattern, Counter tallies,
+// disclosing a branch condition that is observable anyway.
+
+export enum BallotState { OPEN, CLOSED }
+
+export sealed ledger admin: Bytes<32>;
+export ledger ballotState: BallotState;
+export ledger yesVotes: Counter;
+export ledger noVotes: Counter;
+
+// Spent nullifiers. One per secret — reveals participation count,
+// nothing about identity.
+export ledger nullifiers: Set<Bytes<32>>;
+
+witness voterSecret(): Bytes<32>;
+
+constructor() {
+    admin = disclose(voterKey(voterSecret()));
+    ballotState = BallotState.OPEN;
+}
+
+export circuit vote(voteYes: Boolean): [] {
+    assert(ballotState == BallotState.OPEN, "ballot is closed");
+    const nullifier = voteNullifier(voterSecret());
+    assert(!nullifiers.member(nullifier), "already voted");
+    nullifiers.insert(nullifier);
+    // Branching public state on a private parameter is a disclosure:
+    // an observer sees which counter changed. disclose() makes that
+    // explicit instead of accidental.
+    if (disclose(voteYes)) {
+        yesVotes.increment(1);
+    } else {
+        noVotes.increment(1);
+    }
+}
+
+export circuit closeBallot(): [] {
+    assert(voterKey(voterSecret()) == admin, "only the admin can close the ballot");
+    assert(ballotState == BallotState.OPEN, "ballot already closed");
+    ballotState = BallotState.CLOSED;
+}
+
+circuit voteNullifier(secret: Bytes<32>): Bytes<32> {
+    return persistentCommit<Bytes<32>>(pad(32, "echo:ballot:v1"), secret);
+}
+
+circuit voterKey(secret: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "echo:ballot:pk:"), secret]);
+}

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/tokens/colors.css">
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/tokens/typography.css">
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/tokens/effects.css">
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/tokens/console.css">
+<link rel="stylesheet" href="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/styles.css">
+<script src="_ds/echoforge-design-system-9f95285b-1c41-4657-b846-897e8ac365b1/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: #000000; }
+  .ef-root { --ef-bg: #000000; --ef-surface: #0a0a0a; --ef-line: #262626; --ef-faint: #404040; --ef-hair: #262626; --ef-ok: #4ade80; --ef-label: #808080; --ef-body: #c0c0c0; --ef-strong: #e0e0e0; --ef-fg: #ffffff; --ef-glass: rgba(0,0,0,0.86);
+    --ef-veil-h: linear-gradient(90deg, #000000 0%, rgba(0,0,0,0.96) 32%, rgba(0,0,0,0.6) 58%, rgba(0,0,0,0) 80%);
+    --ef-veil-v: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 24%, rgba(0,0,0,0) 76%, rgba(0,0,0,0.9) 100%); }
+  .ef-root[data-theme="light"] { --ef-bg: #ffffff; --ef-surface: #f5f5f5; --ef-line: #d9d9d9; --ef-faint: #8a8a8a; --ef-hair: #d9d9d9; --ef-ok: #15803d; --ef-label: #808080; --ef-body: #404040; --ef-strong: #262626; --ef-fg: #000000; --ef-glass: rgba(255,255,255,0.86);
+    --ef-veil-h: linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.96) 32%, rgba(255,255,255,0.62) 58%, rgba(255,255,255,0) 80%);
+    --ef-veil-v: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0) 24%, rgba(255,255,255,0) 76%, rgba(255,255,255,0.92) 100%); }
+  a { color: var(--ef-fg); text-decoration: none; }
+  a:hover { color: var(--ef-body); }
+  .ef-redact { cursor: help; }
+  .ef-barwrap { transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.34s ease; }
+  .ef-redact:hover .ef-barwrap, .ef-redact:focus-visible .ef-barwrap { transform: scaleY(0.09); opacity: 0.5; }
+  .ef-redact:focus-visible { outline: none; }
+  @keyframes efDrift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes efBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes efBreath { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  @keyframes efRedact { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes efDim { from { color: var(--ef-fg); } to { color: var(--ef-body); } }
+  @media (prefers-reduced-motion: reduce) { .ef-drift { animation: none !important; } }
+</style>
+</helmet>
+
+<div class="dark ef-root" data-ef-root="1" data-theme="dark" style="background: var(--ef-bg); color: var(--ef-fg); font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace; min-height: 100vh; position: relative;">
+
+  <sc-if value="{{ gridOn }}" hint-placeholder-val="{{ true }}">
+    <div class="echo-grid" style="position: fixed; inset: 0; pointer-events: none; z-index: 0;"></div>
+  </sc-if>
+
+  <header style="position: sticky; top: 0; z-index: 40; height: 46px; background: var(--ef-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--ef-line);">
+    <div style="max-width: 1280px; margin: 0 auto; height: 46px; padding: 0 32px; display: flex; align-items: center; gap: 28px;">
+      <a href="#top" style="display: flex; align-items: center; gap: 10px;">
+        <img data-ef-logo="echo-mark" src="assets/echo-mark-white.png" alt="EchoForge" style="width: 17px; height: 17px; object-fit: contain; display: block;">
+        <span style="font-size: 10px; letter-spacing: 0.15em; font-weight: 500;">ECHOFORGE</span>
+        <span style="font-size: 10px; color: var(--ef-faint);">/</span>
+        <span style="font-size: 10px; letter-spacing: 0.15em; color: var(--ef-fg); border: 1px solid var(--ef-faint); padding: 2px 6px;">MIDNIGHT</span>
+      </a>
+      <nav style="display: flex; gap: 22px; margin-left: 10px;">
+        <a href="#lines" style="font-size: 10px; letter-spacing: 0.15em; color: var(--ef-label);" style-hover="color: var(--ef-fg);">THE TWO LINES</a>
+        <a href="#flow" style="font-size: 10px; letter-spacing: 0.15em; color: var(--ef-label);" style-hover="color: var(--ef-fg);">PROOF FLOW</a>
+        <a href="#product" style="font-size: 10px; letter-spacing: 0.15em; color: var(--ef-label);" style-hover="color: var(--ef-fg);">ECHOCERT MIDNIGHT</a>
+      </nav>
+      <div style="flex: 1;"></div>
+      <div style="display: flex; align-items: center; gap: 18px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: efBreath 2s ease-in-out infinite;"></span>
+          <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">MIDNIGHT TESTNET</span>
+        </div>
+        <button type="button" onClick="{{ toggleTheme }}" style="appearance: none; -webkit-appearance: none; cursor: pointer; display: flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.15em; background: transparent; color: var(--ef-label); border: 1px solid var(--ef-line); padding: 5px 9px; transition: color 0.2s ease, border-color 0.2s ease;" style-hover="color: var(--ef-fg); border-color: var(--ef-faint);">
+          <span style="font-size: 10px;">◐</span>
+          <span>THEME</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div style="position: relative; z-index: 1;">
+
+  <div data-ef-stage="1" style="position: sticky; top: 46px; height: 0; z-index: 0; pointer-events: none;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: calc(100vh - 46px); overflow: hidden; opacity: 0;">
+      <canvas data-ef-field="1" ref="{{ fieldRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
+      <div style="position: absolute; inset: 0; background: var(--ef-veil-h);"></div>
+      <div style="position: absolute; inset: 0; background: var(--ef-veil-v);"></div>
+    </div>
+  </div>
+
+  <section id="top" data-ef-hero="1" style="position: relative; z-index: 1; min-height: calc(100vh - 46px); display: flex; flex-direction: column; justify-content: center;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; box-sizing: border-box; width: 100%;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 40px;">
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: #60a5fa;">◌</span>
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">MLH HACKATHON DEMO · ECHOFORGE × MIDNIGHT</span>
+      </div>
+
+      <h1 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: clamp(2.8rem, 8vw, 7rem); line-height: 1.0; letter-spacing: -0.03em; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.3em;">
+        <span>All for</span>
+        <span class="ef-redact" tabindex="0" role="button" aria-label="Reveal the redacted word" style="position: relative; display: inline-block;">
+          <span style="display: inline-block;">Simple</span>
+          <span class="ef-barwrap" style="position: absolute; left: -0.07em; right: -0.07em; top: 0.19em; height: 0.6em; transform-origin: center center;">
+            <span style="display: block; width: 100%; height: 100%; background: var(--ef-fg); transform: scaleX(0); transform-origin: left center; animation: efRedact 1.05s cubic-bezier(0.22, 1, 0.36, 1) 2.2s forwards;"></span>
+          </span>
+        </span>
+      </h1>
+
+      <div style="margin-top: 34px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="font-size: 10px; letter-spacing: 0.15em; color: var(--ef-label);">一切为简 · PRIVACY IS THE SIMPLEST DEFAULT</span>
+        <span style="font-size: 10px; letter-spacing: 0.15em; color: var(--ef-label);">▚ HOVER TO UNREDACT</span>
+      </div>
+    </div>
+
+    <a href="#proof" data-ef-cue="1" style="position: absolute; bottom: 40px; left: 0; right: 0;">
+      <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">SCROLL</span>
+        <span style="height: 1px; width: 64px; background: var(--ef-line);"></span>
+        <span style="font-size: 11px; color: var(--ef-label);">↓</span>
+      </div>
+    </a>
+  </section>
+
+  <section id="proof" data-ef-proof="1" style="position: relative; z-index: 1; min-height: calc(100vh - 46px); display: flex; align-items: center; border-bottom: 1px solid var(--ef-line);">
+    <div style="position: relative; max-width: 1280px; margin: 0 auto; padding: 96px 32px; box-sizing: border-box; width: 100%;">
+      <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: clamp(1.6rem, 3.4vw, 2.9rem); line-height: 1.15; letter-spacing: -0.01em; text-transform: uppercase; max-width: 22ch;">Credentials that prove nothing else.</h2>
+
+      <p style="margin: 26px 0 0; max-width: 46ch; font-size: 13.5px; line-height: 1.75; color: var(--ef-body); letter-spacing: 0.01em;">The proof goes on Midnight. The document, the holder and the issuer's registry stay off it.</p>
+
+      <div style="display: flex; gap: 12px; margin-top: 38px; flex-wrap: wrap;">
+        <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Button" variant="primary" size="lg" hint-size="190px,44px">RUN THE DEMO ↗</x-import>
+        <a href="#flow" style="display: block;">
+          <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Button" variant="secondary" size="lg" hint-size="170px,44px">PROOF FLOW ↓</x-import>
+        </a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(120px, 180px)); gap: 1px; margin-top: 72px; background: var(--ef-line); border: 1px solid var(--ef-line); width: fit-content;">
+        <div style="background: var(--ef-bg); padding: 14px 18px;">
+          <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">NETWORK</div>
+          <div style="font-size: 12px; margin-top: 7px; color: var(--ef-fg);">Midnight testnet</div>
+        </div>
+        <div style="background: var(--ef-bg); padding: 14px 18px;">
+          <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">PROOF</div>
+          <div style="font-size: 12px; margin-top: 7px; color: var(--ef-fg);">zero-knowledge</div>
+        </div>
+        <div style="background: var(--ef-bg); padding: 14px 18px;">
+          <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">DISCLOSURE</div>
+          <div style="font-size: 12px; margin-top: 7px; color: var(--ef-fg);">field-level</div>
+        </div>
+        <div style="background: var(--ef-bg); padding: 14px 18px;">
+          <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">BUILD</div>
+          <div style="font-size: 12px; margin-top: 7px; color: var(--ef-fg);">0.1 · demo</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <div style="position: relative; z-index: 1; overflow: hidden; border-bottom: 1px solid var(--ef-line); height: 22px; display: flex; align-items: center;">
+    <div class="ef-drift" style="display: flex; width: max-content; animation: efDrift 46s linear infinite; color: var(--ef-line); font-size: 11px; white-space: pre;">
+      <span>░▒▓█ SHIELDED ░▒▓ PROOF ▒░ COMMITMENT ░▒▓█ SELECTIVE DISCLOSURE ▓▒░ WITNESS ░▒ NULLIFIER ▒▓█ ZERO KNOWLEDGE ░▒▓ ECHOFORGE MIDNIGHT ▓▒░ </span>
+      <span>░▒▓█ SHIELDED ░▒▓ PROOF ▒░ COMMITMENT ░▒▓█ SELECTIVE DISCLOSURE ▓▒░ WITNESS ░▒ NULLIFIER ▒▓█ ZERO KNOWLEDGE ░▒▓ ECHOFORGE MIDNIGHT ▓▒░ </span>
+    </div>
+  </div>
+
+  <section id="lines" style="position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 96px 32px;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">[ 01 ]</span>
+      <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-fg);">THE TWO LINES</span>
+      <span style="flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--ef-line) 0 4px, transparent 4px 8px);"></span>
+    </div>
+
+    <h2 style="margin: 26px 0 0; font-weight: 500; font-size: clamp(1.4rem, 2.4vw, 2rem); letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.2;">Two ledgers. One family.</h2>
+    <p style="margin: 18px 0 0; max-width: 58ch; font-size: 13.5px; line-height: 1.75; color: var(--ef-body);">The Cardano line publishes in the open — that openness <em>is</em> the product. The Midnight line publishes the same guarantee, contents withheld.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-top: 48px;">
+
+      <div style="position: relative; border: 1px solid var(--ef-line); background: var(--ef-surface); padding: 28px;">
+        <span class="corner-tl"></span><span class="corner-tr"></span><span class="corner-bl"></span><span class="corner-br"></span>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+          <div>
+            <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">LINE 01 / CARDANO</div>
+            <div style="font-size: 15px; letter-spacing: 0.1em; margin-top: 10px; text-transform: uppercase;">Public by design</div>
+          </div>
+          <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Badge" status="live" hint-size="86px,22px"></x-import>
+        </div>
+        <div style="height: 1px; background: var(--ef-line); margin: 24px 0;"></div>
+        <div style="display: grid; grid-template-columns: 78px 1fr; gap: 12px 14px; font-size: 11.5px; line-height: 1.5;">
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">SUBJECT</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-fg); letter-spacing: -0.06em;">████████</span><span style="color: var(--ef-strong);">Alice Chen</span></div>
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">DEGREE</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-fg); letter-spacing: -0.06em;">████████</span><span style="color: var(--ef-strong);">M.Sc. Physics</span></div>
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">ISSUER</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-fg); letter-spacing: -0.06em;">████████</span><span style="color: var(--ef-strong);">Tsinghua University</span></div>
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">ANCHOR</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-fg); letter-spacing: -0.06em;">████████</span><span style="color: var(--ef-strong);">9f4a…c21e</span></div>
+        </div>
+        <p style="margin: 26px 0 0; font-size: 12.5px; line-height: 1.7; color: var(--ef-label);">An open registry of who issued what. Verifiable forever, without permission.</p>
+      </div>
+
+      <div style="position: relative; border: 1px solid var(--ef-faint); background: var(--ef-surface); padding: 28px;">
+        <span class="corner-tl"></span><span class="corner-tr"></span><span class="corner-bl"></span><span class="corner-br"></span>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+          <div>
+            <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">LINE 02 / MIDNIGHT</div>
+            <div style="font-size: 15px; letter-spacing: 0.1em; margin-top: 10px; text-transform: uppercase;">Private by default</div>
+          </div>
+          <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Badge" status="dev" hint-size="140px,22px"></x-import>
+        </div>
+        <div style="height: 1px; background: var(--ef-line); margin: 24px 0;"></div>
+        <div style="display: grid; grid-template-columns: 78px 1fr; gap: 12px 14px; font-size: 11.5px; line-height: 1.5;">
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">SUBJECT</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-faint); letter-spacing: -0.06em;">░░░░░░░░</span><span style="color: var(--ef-label);">shielded</span></div>
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">DEGREE</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-fg); letter-spacing: -0.06em;">████████</span><span style="color: var(--ef-strong);">M.Sc. Physics</span></div>
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">ISSUER</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-faint); letter-spacing: -0.06em;">▒▒▒▒▒▒▒▒</span><span style="color: var(--ef-label);">proven, not named</span></div>
+          <div style="color: var(--ef-label); letter-spacing: 0.1em;">ANCHOR</div>
+          <div style="display: flex; gap: 12px;"><span style="color: var(--ef-fg); letter-spacing: -0.06em;">████████</span><span style="color: var(--ef-strong);">9f4a…c21e</span></div>
+        </div>
+        <p style="margin: 26px 0 0; font-size: 12.5px; line-height: 1.7; color: var(--ef-label);">The verifier learns one field, and that it is genuine. The holder picks the field.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="flow" style="position: relative; z-index: 1; border-top: 1px solid var(--ef-line); background: var(--ef-surface);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 96px 32px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">[ 02 ]</span>
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-fg);">PROOF FLOW</span>
+        <span style="flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--ef-line) 0 4px, transparent 4px 8px);"></span>
+      </div>
+
+      <h2 style="margin: 26px 0 0; font-weight: 500; font-size: clamp(1.4rem, 2.4vw, 2rem); letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.2;">Four steps. One boolean.</h2>
+      <p style="margin: 18px 0 40px; max-width: 58ch; font-size: 13.5px; line-height: 1.75; color: var(--ef-body);">Step through it. Watch what stays on the device.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--ef-line); border: 1px solid var(--ef-line);">
+        <sc-for list="{{ stages }}" as="s" hint-placeholder-count="4">
+          <button type="button" onClick="{{ s.onSelect }}" style="appearance: none; -webkit-appearance: none; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; text-align: left; cursor: pointer; padding: 20px 22px; font-family: 'IBM Plex Mono', monospace; border: 0; border-left: 2px solid {{ s.edge }}; background: {{ s.bg }}; color: inherit; transition: background 0.2s ease, border-color 0.2s ease;" style-hover="background: var(--ef-surface);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">{{ s.num }}</span>
+              <span style="font-size: 12px; letter-spacing: 0.15em; color: {{ s.fg }};">{{ s.key }}</span>
+            </div>
+            <div style="margin-top: 12px; font-size: 11.5px; line-height: 1.65; color: var(--ef-label);">{{ s.blurb }}</div>
+            <div style="margin-top: auto; padding-top: 16px; font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">PUBLISHED · {{ s.bytes }}</div>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-top: 24px;">
+        <div style="position: relative; border: 1px solid var(--ef-line); padding: 26px; background: var(--ef-bg);">
+          <span class="corner-tl"></span><span class="corner-br"></span>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-fg);">ON DEVICE</span>
+            <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">HOLDER'S WITNESS</span>
+          </div>
+          <div style="height: 1px; background: var(--ef-line); margin: 20px 0;"></div>
+          <div style="display: grid; grid-template-columns: 74px 1fr; gap: 11px 14px; font-size: 11.5px;">
+            <sc-for list="{{ deviceRows }}" as="r" hint-placeholder-count="5">
+              <div style="color: var(--ef-label); letter-spacing: 0.1em;">{{ r.label }}</div>
+              <div style="display: flex; gap: 12px;"><span style="letter-spacing: -0.06em; color: {{ r.barTone }};">{{ r.bar }}</span><span style="color: {{ r.tone }};">{{ r.note }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="position: relative; border: 1px solid var(--ef-line); padding: 26px; background: var(--ef-bg);">
+          <span class="corner-tl"></span><span class="corner-br"></span>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-fg);">ON MIDNIGHT</span>
+            <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">{{ activeKey }}</span>
+          </div>
+          <div style="height: 1px; background: var(--ef-line); margin: 20px 0;"></div>
+          <div style="display: grid; grid-template-columns: 96px 1fr; gap: 11px 14px; font-size: 11.5px;">
+            <sc-for list="{{ chainRows }}" as="r" hint-placeholder-count="2">
+              <div style="color: var(--ef-label); letter-spacing: 0.1em;">{{ r.label }}</div>
+              <div style="color: {{ r.tone }}; word-break: break-all;">{{ r.value }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="product" style="position: relative; z-index: 1; border-top: 1px solid var(--ef-line);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 96px 32px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">[ 03 ]</span>
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-fg);">THE LINE</span>
+        <span style="flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--ef-line) 0 4px, transparent 4px 8px);"></span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 40px; margin-top: 44px; align-items: start;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <h2 style="margin: 0; font-weight: 500; font-size: clamp(1.4rem, 2.4vw, 2rem); letter-spacing: 0.02em; text-transform: uppercase;">EchoCert Midnight</h2>
+            <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Badge" status="dev" hint-size="140px,22px"></x-import>
+          </div>
+          <p style="margin: 20px 0 0; max-width: 48ch; font-size: 13.5px; line-height: 1.75; color: var(--ef-body);">The EchoCert flow, re-targeted at a shielded ledger. Issue as usual; prove selectively.</p>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 1px; margin-top: 34px; background: var(--ef-line); border: 1px solid var(--ef-line);">
+            <div style="background: var(--ef-bg); padding: 14px 18px; display: flex; justify-content: space-between; gap: 16px;">
+              <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">CONTRACT LANGUAGE</span>
+              <span style="font-size: 11.5px;">Compact</span>
+            </div>
+            <div style="background: var(--ef-bg); padding: 14px 18px; display: flex; justify-content: space-between; gap: 16px;">
+              <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">ISSUER KEYS</span>
+              <span style="font-size: 11.5px;">shared with EchoCert</span>
+            </div>
+            <div style="background: var(--ef-bg); padding: 14px 18px; display: flex; justify-content: space-between; gap: 16px;">
+              <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">DISCLOSURE</span>
+              <span style="font-size: 11.5px;">per-field, per-request</span>
+            </div>
+            <div style="background: var(--ef-bg); padding: 14px 18px; display: flex; justify-content: space-between; gap: 16px;">
+              <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">SCOPE</span>
+              <span style="font-size: 11.5px;">MLH hackathon demo</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap;">
+            <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Button" variant="primary" size="md" hint-size="170px,36px">OPEN THE DEMO ↗</x-import>
+            <x-import component-from-global-scope="EchoForgeDesignSystem_9f9528.Button" variant="secondary" size="md" hint-size="150px,36px">SOURCE ↗</x-import>
+          </div>
+        </div>
+
+        <div style="position: relative; border: 1px solid var(--ef-line); background: var(--ef-bg); overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--ef-line); background: var(--ef-surface);">
+            <span style="width: 5px; height: 5px; border-radius: 50%; background: #4ade80;"></span>
+            <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">~/echoforge/midnight</span>
+          </div>
+          <pre style="margin: 0; padding: 24px 20px 28px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.85; color: var(--ef-body); white-space: pre; overflow-x: auto;">$ echocert-midnight prove \
+    --credential  9f4a…c21e \
+    --disclose    degree \
+    --hide        subject,issuer
+
+  ◌  building witness ............. ok
+  ◌  proving ....................... 1.84s
+  ◌  submitting to midnight ........ ok
+
+  PROOF     0x7b1e…44af
+  PUBLIC    degree = "M.Sc. Physics"
+  BYTES     288
+
+  <span style="color: var(--ef-ok);">✓ VERIFIED</span> <span style="color: var(--ef-label);">· nothing else disclosed</span></pre>
+        </div>
+      </div>
+
+      <div style="margin-top: 64px; padding: 22px 26px; border: 1px solid var(--ef-line); display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">○</span>
+        <span style="font-size: 11.5px; color: var(--ef-label); letter-spacing: 0.05em;">ONE PRODUCT. The next ships when there is something to show.</span>
+      </div>
+    </div>
+  </section>
+
+  <footer style="position: relative; z-index: 1; border-top: 1px solid var(--ef-line); background: var(--ef-surface);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 34px 32px 0;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">ECHOFORGE MIDNIGHT</span>
+        <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">▚ MOVE THE CURSOR TO REDACT</span>
+      </div>
+      <canvas data-ef-foot="1" style="display: block; width: 100%; height: clamp(110px, 15vw, 200px); margin-top: 14px; cursor: crosshair;"></canvas>
+    </div>
+
+    <div style="max-width: 1280px; margin: 0 auto; padding: 56px 32px 32px; display: grid; grid-template-columns: 1.3fr repeat(3, minmax(150px, 1fr)); gap: 40px; border-top: 1px solid var(--ef-line);">
+      <div>
+        <img data-ef-logo="echoforge-lockup" src="assets/echoforge-lockup-white.png" alt="EchoForge" style="height: 26px; width: auto; display: block; opacity: 0.9;">
+        <div style="margin-top: 20px; font-size: 10px; letter-spacing: 0.15em; color: var(--ef-label);">一切为简 · ALL FOR SIMPLE</div>
+      </div>
+      <div>
+        <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">ECHOFAMILY</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">EchoCert</a>
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">EchoUploader</a>
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">EchoDash</a>
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">ForgeCard</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">MIDNIGHT LINE</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+          <a href="#product" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">EchoCert Midnight</a>
+          <a href="#flow" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">Proof flow</a>
+          <a href="#lines" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">Why two lines</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">ELSEWHERE</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">X ↗</a>
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">GitHub ↗</a>
+          <a href="#top" style="font-size: 11.5px; color: var(--ef-body);" style-hover="color: var(--ef-fg);">echoforgellc.tech ↗</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1280px; margin: 0 auto; padding: 24px 32px 40px; border-top: 1px solid var(--ef-line); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+      <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">ECHOCERT MIDNIGHT 0.1 · MIDNIGHT · ECHO FAMILY</span>
+      <span style="font-size: 9px; letter-spacing: 0.15em; color: var(--ef-label);">© 2026 ECHOFORGE</span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;glyphSet&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;blocks&quot;,&quot;dots&quot;,&quot;hex&quot;,&quot;bars&quot;],&quot;default&quot;:&quot;blocks&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;ASCII field&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0.6,&quot;max&quot;:1.6,&quot;step&quot;:0.1,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;ASCII field&quot;},&quot;driftSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:2.5,&quot;step&quot;:0.1,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;ASCII field&quot;},&quot;showGrid&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+class Component extends DCLogic {
+  state = { stage: 2 };
+  fieldRef = React.createRef();
+
+  stages = [
+    {
+      key: 'ISSUE', blurb: 'Signed on the issuer\u2019s machine. Nothing written yet.', bytes: '0 BYTES',
+      device: 'open',
+      chain: [{ label: 'LEDGER', value: '— nothing written —', tone: 'var(--ef-label)' }]
+    },
+    {
+      key: 'COMMIT', blurb: 'A commitment fixes the record without describing it.', bytes: '32 BYTES',
+      device: 'open',
+      chain: [
+        { label: 'COMMITMENT', value: '0x9f4ac21e6b7d…8e02', tone: 'var(--ef-strong)' },
+        { label: 'CONTENTS', value: 'not derivable', tone: 'var(--ef-label)' }
+      ]
+    },
+    {
+      key: 'PROVE', blurb: 'The holder proves one field. The rest stays home.', bytes: '288 BYTES',
+      device: 'shielded',
+      chain: [
+        { label: 'COMMITMENT', value: '0x9f4ac21e6b7d…8e02', tone: 'var(--ef-strong)' },
+        { label: 'PROOF', value: '0x7b1e44af…c93d', tone: 'var(--ef-strong)' },
+        { label: 'PUBLIC IN', value: 'degree = "M.Sc. Physics"', tone: 'var(--ef-fg)' },
+        { label: 'HOLDER', value: 'unlinkable', tone: 'var(--ef-label)' }
+      ]
+    },
+    {
+      key: 'VERIFY', blurb: 'Anyone checks it. The answer is a boolean.', bytes: '288 BYTES',
+      device: 'shielded',
+      chain: [
+        { label: 'CHECK', value: 'proof ↔ commitment', tone: 'var(--ef-strong)' },
+        { label: 'RESULT', value: '✓ VALID', tone: '#4ade80' },
+        { label: 'LEARNED', value: 'one field, nothing else', tone: 'var(--ef-label)' }
+      ]
+    }
+  ];
+
+  record = [
+    { label: 'SUBJECT', value: 'Alice Chen', keep: false },
+    { label: 'DEGREE', value: 'M.Sc. Physics', keep: true },
+    { label: 'ISSUER', value: 'Tsinghua University', keep: false },
+    { label: 'ISSUED', value: '2026-06-30', keep: false },
+    { label: 'ANCHOR', value: '9f4a…c21e', keep: true }
+  ];
+
+  componentDidMount() {
+    this.boot(0);
+    this.applyTheme(this.theme());
+  }
+
+  componentDidUpdate(prev) {
+    if (prev.theme !== this.props.theme && this.props.theme) {
+      this.picked = null;
+      this.applyTheme(this.props.theme);
+    }
+  }
+
+  theme() { return this.picked || this.props.theme || 'dark'; }
+
+  ink() { return this.theme() === 'light' ? '#000000' : '#ffffff'; }
+
+  applyTheme(t) {
+    const root = document.querySelector('[data-ef-root]');
+    if (!root) return;
+    const light = t === 'light';
+    root.setAttribute('data-theme', light ? 'light' : 'dark');
+    root.classList.toggle('dark', !light);
+    const page = light ? '#ffffff' : '#000000';
+    document.documentElement.style.background = page;
+    document.body.style.background = page;
+    root.querySelectorAll('img[data-ef-logo]').forEach((img) => {
+      img.src = 'assets/' + img.getAttribute('data-ef-logo') + (light ? '-black.png' : '-white.png');
+    });
+    if (this.footPaint) this.footPaint();
+  }
+
+  toggleTheme = () => {
+    this.picked = this.theme() === 'light' ? 'dark' : 'light';
+    this.applyTheme(this.picked);
+  };
+
+  boot(n) {
+    if (this.dead) return;
+    if (!this.fieldOk) this.fieldOk = this.startField();
+    if (!this.footOk) this.footOk = this.startFooter();
+    if (!this.scrollOk) this.scrollOk = this.startScroll();
+    if ((!this.fieldOk || !this.footOk || !this.scrollOk) && n < 120) this.retry = setTimeout(() => this.boot(n + 1), 80);
+  }
+
+  startScroll() {
+    const hero = document.querySelector('[data-ef-hero]');
+    const layer = document.querySelector('[data-ef-stage] > div');
+    const cue = document.querySelector('[data-ef-cue]');
+    const proof = document.querySelector('[data-ef-proof] > div');
+    if (!hero || !layer || !proof) return false;
+
+    const ease = (x) => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+    const span = (x, a, b) => ease((x - a) / (b - a));
+    let last = -1;
+
+    const tick = () => {
+      if (this.dead) return;
+      this.srf = requestAnimationFrame(tick);
+      const r = hero.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (46 - r.top) / Math.max(240, r.height * 0.9)));
+      if (Math.abs(p - last) < 0.004) return;
+      last = p;
+      layer.style.opacity = span(p, 0.06, 0.82).toFixed(3);
+      hero.style.opacity = (1 - span(p, 0.18, 0.72) * 0.96).toFixed(3);
+      hero.style.transform = 'translateY(' + (-span(p, 0.1, 1) * 44).toFixed(1) + 'px)';
+      if (cue) cue.style.opacity = (1 - span(p, 0, 0.22)).toFixed(3);
+      proof.style.opacity = span(p, 0.5, 0.95).toFixed(3);
+      proof.style.transform = 'translateY(' + ((1 - span(p, 0.5, 1)) * 26).toFixed(1) + 'px)';
+    };
+    tick();
+    return true;
+  }
+
+  componentWillUnmount() {
+    this.dead = true;
+    if (this.retry) clearTimeout(this.retry);
+    if (this.srf) cancelAnimationFrame(this.srf);
+    if (this.raf) cancelAnimationFrame(this.raf);
+    if (this.onResize) window.removeEventListener('resize', this.onResize);
+    if (this.footCleanup) this.footCleanup();
+  }
+
+  startFooter() {
+    const cv = document.querySelector('canvas[data-ef-foot]');
+    if (!cv) return false;
+    const rect0 = cv.getBoundingClientRect();
+    if (!rect0.width || !rect0.height) return false;
+    const ctx = cv.getContext('2d');
+    if (!ctx) return false;
+
+    let W = 0, H = 0, mask = null, cw = 12, chh = 16, cols = 0, rows = 0;
+    let mx = null, my = null, queued = false;
+    let node = cv, ctx2 = ctx;
+
+    const build = () => {
+      const cv = node, ctx = ctx2;
+      const r = cv.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.max(320, Math.round(r.width));
+      H = Math.max(80, Math.round(r.height));
+      cv.width = Math.round(W * dpr);
+      cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cw = W > 900 ? 12 : 10;
+      chh = Math.round(cw * 1.35);
+      cols = Math.ceil(W / cw);
+      rows = Math.ceil(H / chh);
+      const off = document.createElement('canvas');
+      off.width = W; off.height = H;
+      const oc = off.getContext('2d');
+      oc.textAlign = 'center';
+      oc.textBaseline = 'middle';
+      oc.fillStyle = this.ink();
+      const fs = Math.min(H * 1.02, W / 4.5);
+      oc.font = '700 ' + Math.round(fs) + "px 'IBM Plex Mono', monospace";
+      oc.fillText('MIDNIGHT', W / 2, H / 2);
+      mask = oc.getImageData(0, 0, W, H).data;
+      paint();
+    };
+
+    const paint = () => {
+      if (!mask) return;
+      const ctx = ctx2;
+      ctx.clearRect(0, 0, W, H);
+      ctx.font = cw + "px 'IBM Plex Mono', monospace";
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = this.ink();
+      const rad = Math.max(70, Math.min(130, W * 0.09));
+      for (let gy = 0; gy < rows; gy++) {
+        const py = gy * chh;
+        const sy = Math.min(H - 1, Math.round(py + chh / 2));
+        for (let gx = 0; gx < cols; gx++) {
+          const px = gx * cw;
+          const sx = Math.min(W - 1, Math.round(px + cw / 2));
+          const lit = mask[(sy * W + sx) * 4 + 3] > 90;
+          const d = mx === null ? 1e6 : Math.sqrt((px + cw / 2 - mx) * (px + cw / 2 - mx) + (py + chh / 2 - my) * (py + chh / 2 - my));
+          const near = d / rad;
+          if (lit) {
+            if (near < 1) { ctx.globalAlpha = 0.14 + 0.16 * near; ctx.fillText('░', px, py); }
+            else { ctx.globalAlpha = 0.93; ctx.fillText('█', px, py); }
+          } else {
+            const h = (gx * 13 + gy * 29) % 11;
+            if (near < 1.6 && h < 4) { ctx.globalAlpha = 0.36 - 0.2 * (near / 1.6); ctx.fillText('·', px, py); }
+            else if (h === 0) { ctx.globalAlpha = 0.10; ctx.fillText('·', px, py); }
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const ensure = () => {
+      const live = document.querySelector('canvas[data-ef-foot]');
+      if (live && live !== node) {
+        node = live;
+        ctx2 = live.getContext('2d');
+        build();
+        return true;
+      }
+      return false;
+    };
+
+    const onMove = (e) => {
+      const r = node.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const inside = x >= -50 && y >= -50 && x <= r.width + 50 && y <= r.height + 50;
+      if (!inside && mx === null) return;
+      mx = inside ? x : null;
+      my = inside ? y : null;
+      paint();
+    };
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    const onWin = () => build();
+    window.addEventListener('resize', onWin);
+    this.footTick = setInterval(() => { if (!this.dead) { if (!ensure() && node.width === 0) build(); } }, 1500);
+    this.footCleanup = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('resize', onWin);
+      if (this.footTick) clearInterval(this.footTick);
+    };
+
+    this.footPaint = paint;
+    build();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.dead) build(); });
+    return true;
+  }
+
+  startField() {
+    const cv = (this.fieldRef && this.fieldRef.current) || document.querySelector('canvas[data-ef-field]');
+    if (!cv || !cv.getBoundingClientRect().width) return false;
+    const ctx = cv.getContext('2d');
+    if (!ctx) return false;
+    const ramps = {
+      blocks: ['·', ':', '▒', '█'],
+      dots: ['.', ':', '•', '◆'],
+      hex: ['.', '1', 'a', 'f'],
+      bars: ['·', '-', '=', '█']
+    };
+    let W = 0, H = 0;
+    const resize = () => {
+      const r = cv.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.max(320, Math.round(r.width || 1200));
+      H = Math.max(240, Math.round(r.height || 700));
+      cv.width = Math.round(W * dpr);
+      cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    this.onResize = () => { resize(); if (this.reduced) this.paint(ctx, W, H, 0); };
+    window.addEventListener('resize', this.onResize);
+
+    this.paint = (c, w, h, t) => {
+      const d = Math.max(0.5, Math.min(2, this.props.density ?? 1));
+      const ramp = ramps[this.props.glyphSet ?? 'blocks'] || ramps.blocks;
+      const cw = Math.max(7, Math.round(13 / d));
+      const chh = Math.max(12, Math.round(24 / d));
+      c.clearRect(0, 0, w, h);
+      c.font = Math.round(cw) + "px 'IBM Plex Mono', monospace";
+      c.textBaseline = 'top';
+      c.fillStyle = this.ink();
+      const cx = w * 0.68, cy = h * 0.50, R = Math.min(w * 0.33, h * 0.60);
+      const cols = Math.ceil(w / cw), rows = Math.ceil(h / chh) + 1;
+      for (let gy = 0; gy < rows; gy++) {
+        const py = gy * chh;
+        const ny = py * 0.014;
+        const dy = (py - cy) / R;
+        for (let gx = 0; gx < cols; gx++) {
+          const px = gx * cw;
+          const nx = px * 0.013;
+          const n = Math.sin(nx + t * 0.30) * Math.cos(ny * 1.3 - t * 0.21)
+                  + Math.sin((nx + ny) * 0.7 + t * 0.15) * 0.6;
+          const dx = (px - cx) / R;
+          const r2 = dx * dx + dy * dy;
+          let v;
+          if (r2 < 1) {
+            v = (Math.sin(dy * 13 + n * 0.6 + t * 0.12) - 0.2) * 1.7 * Math.sqrt(1 - r2);
+          } else {
+            const fall = Math.max(0, 1.6 - Math.sqrt(r2));
+            v = (n * 0.5 + 0.12) * fall * 0.4;
+          }
+          if (v <= 0.10 + ((gx * 7 + gy * 13) % 5) / 5 * 0.20) continue;
+          c.globalAlpha = v > 0.34 ? 0.95 : 0.6;
+          c.fillText(v > 0.55 ? ramp[3] : v > 0.34 ? ramp[2] : v > 0.18 ? ramp[1] : ramp[0], px, py);
+        }
+      }
+      c.globalAlpha = 1;
+    };
+
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this.reduced) { this.paint(ctx, W, H, 0); return true; }
+
+    let prev = 0, clock = 0;
+    const loop = (ts) => {
+      this.raf = requestAnimationFrame(loop);
+      if (ts - prev < 42) return;
+      const dt = prev ? Math.min(0.2, (ts - prev) / 1000) : 0;
+      prev = ts;
+      clock += dt * (this.props.driftSpeed ?? 1);
+      this.paint(ctx, W, H, clock);
+    };
+    this.raf = requestAnimationFrame(loop);
+    return true;
+  }
+
+  renderVals() {
+    const i = this.state.stage;
+    const active = this.stages[i];
+    const shielded = active.device === 'shielded';
+    return {
+      fieldRef: this.fieldRef,
+      toggleTheme: this.toggleTheme,
+      gridOn: this.props.showGrid ?? true,
+      activeKey: 'AFTER ' + active.key,
+      stages: this.stages.map((s, n) => ({
+        key: s.key,
+        blurb: s.blurb,
+        bytes: s.bytes,
+        num: '0' + (n + 1),
+        onSelect: () => this.setState({ stage: n }),
+        bg: n === i ? 'var(--ef-surface)' : 'transparent',
+        edge: n === i ? 'var(--ef-fg)' : 'transparent',
+        fg: n === i ? 'var(--ef-fg)' : 'var(--ef-label)'
+      })),
+      deviceRows: this.record.map((r) => {
+        const open = !shielded || r.keep;
+        return {
+          label: r.label,
+          bar: open ? '████████' : '░░░░░░░░',
+          barTone: open ? 'var(--ef-fg)' : 'var(--ef-line)',
+          note: open ? r.value : 'shielded',
+          tone: open ? 'var(--ef-strong)' : 'var(--ef-label)'
+        };
+      }),
+      chainRows: active.chain
+    };
+  }
+}
+
+</script>
+</body>
+</html>

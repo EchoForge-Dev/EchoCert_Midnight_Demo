@@ -1,0 +1,56 @@
+pragma language_version 0.23;
+import CompactStandardLibrary;
+
+// EXAMPLE 03 — DOCUMENT ANCHOR (EchoUploader direction)
+// Pay a fixed fee in the native token, anchor a document hash on the
+// public ledger. The file itself never touches the chain — hash only.
+// The owner can sweep accumulated fees.
+//
+// Teaches: unshielded token receive/send, owner authentication via a
+// secret-derived public key, disclosing circuit parameters on purpose.
+
+export sealed ledger owner: Bytes<32>;
+export sealed ledger anchorFee: Uint<16>;
+
+// Anchored document hashes — public by design.
+export ledger anchors: Set<Bytes<32>>;
+
+// Fees received since the last claim, in native-token units.
+export ledger unclaimedFees: Counter;
+
+witness ownerSecret(): Bytes<32>;
+
+constructor(fee: Uint<16>) {
+    assert(fee > 0, "fee must be greater than zero");
+    // The owner's public key is a hash of witness data: publishing it
+    // is a deliberate disclosure, so disclose() is required.
+    owner = disclose(ownerKey(ownerSecret()));
+    anchorFee = disclose(fee);
+}
+
+export circuit anchor(docHash: Bytes<32>): [] {
+    // Circuit parameters are private inputs by default. An anchor is
+    // public by design, so disclose it once, explicitly, at the top.
+    const hash = disclose(docHash);
+    assert(!anchors.member(hash), "document already anchored");
+    receiveUnshielded(nativeToken(), anchorFee as Uint<128>);
+    anchors.insert(hash);
+    unclaimedFees.increment(anchorFee);
+}
+
+export circuit claimFees(to: UserAddress): [] {
+    assert(ownerKey(ownerSecret()) == owner, "only the owner can claim fees");
+    const total = unclaimedFees.read();
+    assert(total > 0, "no fees to claim");
+    assert(unshieldedBalanceGte(nativeToken(), total), "contract balance wrong");
+    sendUnshielded(
+        nativeToken(),
+        disclose(total) as Uint<128>,
+        right<ContractAddress, UserAddress>(disclose(to))
+    );
+    unclaimedFees.resetToDefault();
+}
+
+circuit ownerKey(secret: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "echo:anchor:pk:"), secret]);
+}

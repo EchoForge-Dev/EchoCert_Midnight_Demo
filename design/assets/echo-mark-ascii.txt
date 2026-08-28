@@ -1,0 +1,21 @@
+EchoForge mark — "mark-medium", the command-line echo sphere (30×13).
+Source: EchoForge OS · modules/common/brand.nix (markMedium).
+
+Uses only ▀ ▄ █ so the IBM437 console font can render it on a bare VT,
+and contains no backslashes (safe inside agetty's /etc/issue escapes).
+Shown pre-login in /etc/issue on every profile — hidden behind
+Ctrl+Alt+F2 on desktops, first thing on screen over RPi4 HDMI.
+
+          ▄▄▄▄▄▄▄
+        ▀▀▀▀▀▀██████▄▄▄▄▄▄▄
+     ▄▄▄▄▄▄▄▄▄   ▀▀▀████████▄
+   ▄█████████████▄▄▄         ▄▄
+   ▀▀         ▀▀▀██████████████
+  ▄▄▄█████████▄▄▄   ▀▀▀▀▀▀▀▀▀
+  ███▀▀▀▀▀▀▀▀▀██████▄▄▄▄▄▄▄▄▄███
+     ▄▄▄▄▄▄▄▄▄   ▀▀▀█████████▀▀▀
+   ██████████████▄▄▄         ▄▄
+   ▀▀         ▀▀▀█████████████▀
+     ▀████████▄▄▄   ▀▀▀▀▀▀▀▀▀
+       ▀▀▀▀▀▀▀██████▄▄▄▄▄▄
+                 ▀▀▀▀▀▀▀

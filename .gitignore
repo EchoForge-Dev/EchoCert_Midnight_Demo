@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+**/.DS_Store
+
+# Local env — never commit secrets
+.env
+.env.local
+**/.env
+**/.env.local
+
+# Build output
+build/
+dist/
+*.log

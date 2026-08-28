@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "echomkb": {
+      "source": "EchoForge-Dev/EchoMKB",
+      "sourceType": "github",
+      "skillPath": "skills/echomkb/SKILL.md",
+      "computedHash": "56fc48947ceac70b0ab52510443606cb01cc0a9e192f2a48ae5baaa1d9a03741"
+    }
+  }
+}
