@@ -335,7 +335,7 @@ paintMute();
 
 renderCredential();
 setState("DRAFT", null);
-detectMode().then(readChain);
+detectMode().then(() => { runBoot(); return readChain(); });
 
 
 // --- the three verifiers ---------------------------------------------------
@@ -424,3 +424,93 @@ $("btn-three").addEventListener("click", () => { play("press"); return proveToAl
   console.error(e);
 }); });
 renderVerifiers([{}, {}, {}]);
+
+
+// --- boot sequence ---------------------------------------------------------
+//
+// The submission rules require the first seconds of the video to name the
+// hackathon and the entrant. Putting that in the product rather than in the
+// edit means it cannot be lost when the video is recut.
+//
+// The two self-checks are real network probes. If the proof server is down the
+// boot screen says so, which is the honest thing for a page whose whole point
+// is that proofs are real.
+
+const BOOT_CMD = 'echocert demo --for "MLH Midnight Hackathon" --by "Charles Tao"';
+
+async function runBoot() {
+  const boot = $("boot");
+  const seenThisSession = (() => {
+    try { return sessionStorage.getItem("echocert-booted") === "1"; } catch { return false; }
+  })();
+  const forced = new URLSearchParams(location.search).has("boot");
+  if (seenThisSession && !forced) return;
+  try { sessionStorage.setItem("echocert-booted", "1"); } catch { /* ignore */ }
+
+  boot.hidden = false;
+  let skipped = false;
+  const finish = () => {
+    if (skipped) return;
+    skipped = true;
+    boot.classList.add("leaving");
+    setTimeout(() => { boot.hidden = true; }, 500);
+  };
+  boot.addEventListener("click", finish);
+  document.addEventListener("keydown", finish, { once: true });
+
+  // type the command
+  const cmd = $("boot-cmd");
+  for (let i = 0; i < BOOT_CMD.length && !skipped; i++) {
+    cmd.textContent += BOOT_CMD[i];
+    await sleep(BOOT_CMD[i] === " " ? 12 : 22);
+  }
+  if (skipped) return;
+
+  // the brand mark, a line at a time
+  try {
+    const res = await fetch("../design/assets/echo-mark-ascii.txt");
+    const lines = (await res.text()).split("\n").filter((l) => /[▀▄█]/.test(l));
+    const mark = $("boot-mark");
+    lines.forEach((line, i) => {
+      const el = document.createElement("span");
+      el.textContent = line;
+      el.style.animationDelay = `${i * 28}ms`;
+      mark.appendChild(el);
+    });
+    await sleep(lines.length * 28 + 120);
+  } catch { /* the mark is decoration; the naming above is the requirement */ }
+  if (skipped) return;
+
+  // real probes, reported honestly
+  const checks = $("boot-checks");
+  const line = (label, ok, detail) => {
+    const el = document.createElement("p");
+    el.className = "boot-check";
+    el.innerHTML = `<span class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</span> ${label} <span style="color:var(--text-secondary)">${detail}</span>`;
+    checks.appendChild(el);
+  };
+
+  let proverOk = false, proverDetail = "not running — the page will replay measured timings";
+  try {
+    const r = await fetch(`${PROVER_URL}/health`, { signal: AbortSignal.timeout(1200) });
+    if (r.ok) { const h = await r.json(); proverOk = true; proverDetail = `${h.network} · ${h.contractAddress.slice(0, 12)}…`; }
+  } catch { /* stays false */ }
+  line("local proof server", proverOk, proverDetail);
+  await sleep(260);
+
+  let chainOk = false, chainDetail = "unreachable";
+  try {
+    const r = await fetch(indexer, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query: "{ block { height } }" }),
+      signal: AbortSignal.timeout(4000),
+    });
+    const j = await r.json();
+    const h = j?.data?.block?.height;
+    if (h) { chainOk = true; chainDetail = `block ${h}`; }
+  } catch { /* stays false */ }
+  line("midnight indexer", chainOk, chainDetail);
+
+  await sleep(700);
+  finish();
+}

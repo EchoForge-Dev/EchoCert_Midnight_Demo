@@ -10,6 +10,19 @@
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
+
+<!-- Boot sequence. The first four seconds of the demo video have to name the
+     hackathon and the entrant, so that requirement lives in the product rather
+     than in the edit. The self-checks below are real probes, not theatre. -->
+<div id="boot" class="boot" hidden>
+  <div class="boot-inner">
+    <p class="boot-line"><span class="boot-prompt">$</span> <span id="boot-cmd"></span><span class="boot-caret">_</span></p>
+    <pre class="boot-mark" id="boot-mark"></pre>
+    <div id="boot-checks"></div>
+  </div>
+  <p class="boot-skip">click anywhere to skip</p>
+</div>
+
 <div class="wrap">
 
   <header>
