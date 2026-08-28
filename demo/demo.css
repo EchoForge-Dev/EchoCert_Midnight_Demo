@@ -214,3 +214,32 @@ a { color: var(--text-primary); }
 .boot-check .ok { color: var(--success); }
 .boot-check .no { color: var(--disclose); }
 .boot-skip { position: absolute; bottom: 24px; font-size: 10px; letter-spacing: 0.14em; color: var(--text-secondary); }
+
+/* --- language ------------------------------------------------------------ */
+/* Latin always renders in IBM Plex Mono; the Noto fallbacks only ever catch
+   CJK glyphs, which is what the design system requires. */
+html[lang="zh"] body, html[lang="zh"] .btn, html[lang="zh"] button { font-family: "IBM Plex Mono", "Noto Sans SC", monospace; }
+html[lang="tw"] body, html[lang="tw"] .btn, html[lang="tw"] button { font-family: "IBM Plex Mono", "Noto Sans TC", monospace; }
+html[lang="ja"] body, html[lang="ja"] .btn, html[lang="ja"] button { font-family: "IBM Plex Mono", "Noto Sans JP", monospace; }
+
+.lang-switch { display: inline-flex; gap: 9px; align-items: center; }
+.lang-switch button {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: inherit; font-size: 10px; letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+.lang-switch button[aria-current="true"] { color: var(--text-primary); }
+
+/* --- footer -------------------------------------------------------------- */
+
+.foot {
+  max-width: 1100px; margin: 0 auto; padding: 40px 20px 60px;
+  border-top: 1px solid var(--border-color);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.foot-mark { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.foot-motto { font-size: 11px; letter-spacing: 0.22em; color: var(--text-secondary); }
+.foot-links { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; }
+.foot-links a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px solid var(--border-color); }
+.foot-links a:hover { color: var(--text-primary); }
+.foot-note { font-size: 11px; color: var(--text-secondary); }

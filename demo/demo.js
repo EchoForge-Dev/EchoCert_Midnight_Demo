@@ -94,6 +94,185 @@ let liveNetwork = "undeployed";
 let forging = false;
 let busy = false;
 
+
+
+// --- languages -------------------------------------------------------------
+//
+// EN leads; the other three are written, not machine-translated. Technical
+// labels (DISCLOSED FIELD, TRANSACTION, ○ LOCAL) stay in English on purpose —
+// they are part of the design system's engineering register, and translating
+// them would make the interface read less like an instrument, not more.
+
+const LANGS = { en: "EN", zh: "简", tw: "繁", ja: "日" };
+
+const I18N = {
+  en: {
+    s1: "THE SAME CREDENTIAL, TWO WAYS",
+    s2: "THE CREDENTIAL · CLICK A FIELD TO KEEP IT HOME",
+    s3: "PROVE",
+    s4: "THREE VERIFIERS · NONE OF THEM CAN TELL",
+    s5: "WHAT THE CHAIN ACTUALLY SHOWS",
+    before: "A public credential registry, live today. Anyone can verify a diploma — and anyone can read every field of it. Verifiability came at the price of privacy.",
+    after: "The same credential, proved one field at a time. The verifier learns that the diploma is real and nothing else — and cannot link two proofs to one holder.",
+    btnProve: "Prove selected field",
+    btnForge: "Try it with a forged diploma",
+    btnForgeBack: "Back to the real diploma",
+    btnReset: "Reset",
+    btnThree: "Prove to all three",
+    threeIntro: "Chuck applies to three universities and proves the same degree to each. Three separate proofs, three separate transactions. Nothing in them ties the three together.",
+    chainHint: "This panel is a plain HTTP POST to the public Midnight indexer — no wallet, no SDK, nothing private. Anyone can run the same query.",
+    motto: "ALL FOR SIMPLE",
+    footNote: "Built for the MLH Midnight Hackathon, 2026 · Charles Tao",
+    footAnchor: "the Cardano record",
+    skip: "click anywhere to skip",
+    noteAllRedacted: "Everything is redacted. Leave one field open to prove it.",
+    noteProving: (f) => `Proving ${f}. Everything else stays on this device — it is never sent, not even encrypted.`,
+    anchorLine: "ANCHOR is the asset name of a real EchoCert credential on Cardano mainnet, minted 2026-04-11 — which is the SHA-256 of that credential's contents, already 32 bytes.",
+    anchorLink: "Look it up →",
+    forgeHint: "This diploma was never issued. The DEGREE field says whatever its holder wants it to say.",
+    proverLive: "PROVING VIA LOCAL PROOF SERVER",
+    proverReplay: "Replaying timings measured on a real run — this page has no prover.",
+    rejectHint: "No proof exists for a credential that was never issued. There is nothing to submit and nothing to check on chain.",
+    verdictOk: "✓ VALID — the diploma is real",
+  },
+  zh: {
+    s1: "同一张凭证，两种做法",
+    s2: "凭证 · 点一个字段把它留在本地",
+    s3: "证明",
+    s4: "三个验证方 · 谁也认不出",
+    s5: "链上真正能看到什么",
+    before: "公开的凭证登记表，今天就在运行。任何人都能验证一张文凭——也能读到它的每一个字段。可验证性是拿隐私换来的。",
+    after: "同一张凭证，一次只证明一个字段。验证方知道文凭是真的，别的什么都不知道——而且没法把两次证明认成同一个人。",
+    btnProve: "证明选中的字段",
+    btnForge: "换一张伪造的文凭试试",
+    btnForgeBack: "换回真文凭",
+    btnReset: "重置",
+    btnThree: "向三所都证明一次",
+    threeIntro: "Chuck 同时申请三所大学，向每一所证明同一个学位。三次独立的证明，三笔独立的交易。没有任何东西能把这三次连起来。",
+    chainHint: "这个面板只是一次普通的 HTTP POST，发给公开的 Midnight indexer——不用钱包，不用 SDK，不碰任何私密数据。同样的查询任何人都能跑。",
+    motto: "一切为简",
+    footNote: "为 MLH Midnight 黑客松而作，2026 · Charles Tao",
+    footAnchor: "Cardano 上的那条记录",
+    skip: "点任意处跳过",
+    noteAllRedacted: "全都涂黑了。留一个字段不涂，才有东西可证明。",
+    noteProving: (f) => `正在证明 ${f}。其余全部留在这台设备上——不发送，连加密后也不发送。`,
+    anchorLine: "ANCHOR 是 Cardano 主网上一张真实 EchoCert 凭证的资产名，2026-04-11 铸造——它本身就是那张凭证内容的 SHA-256，正好 32 字节。",
+    anchorLink: "去链上查 →",
+    forgeHint: "这张文凭从来没有被签发过。DEGREE 字段上写什么，全凭持有人自己填。",
+    proverLive: "由本地 PROOF SERVER 出证",
+    proverReplay: "回放一次真实运行测得的耗时——这个页面本身没有证明器。",
+    rejectHint: "一张从未签发的凭证不存在任何证明。没有东西可提交，链上也没有东西可查。",
+    verdictOk: "✓ 有效 — 文凭是真的",
+  },
+  tw: {
+    s1: "同一張憑證，兩種做法",
+    s2: "憑證 · 點一個欄位把它留在本地",
+    s3: "證明",
+    s4: "三個驗證方 · 誰也認不出",
+    s5: "鏈上真正能看到什麼",
+    before: "公開的憑證登記表，今天就在運行。任何人都能驗證一張文憑——也能讀到它的每一個欄位。可驗證性是拿隱私換來的。",
+    after: "同一張憑證，一次只證明一個欄位。驗證方知道文憑是真的，別的什麼都不知道——而且沒法把兩次證明認成同一個人。",
+    btnProve: "證明選中的欄位",
+    btnForge: "換一張偽造的文憑試試",
+    btnForgeBack: "換回真文憑",
+    btnReset: "重置",
+    btnThree: "向三所都證明一次",
+    threeIntro: "Chuck 同時申請三所大學，向每一所證明同一個學位。三次獨立的證明，三筆獨立的交易。沒有任何東西能把這三次連起來。",
+    chainHint: "這個面板只是一次普通的 HTTP POST，發給公開的 Midnight indexer——不用錢包，不用 SDK，不碰任何私密資料。同樣的查詢任何人都能跑。",
+    motto: "一切為簡",
+    footNote: "為 MLH Midnight 黑客松而作，2026 · Charles Tao",
+    footAnchor: "Cardano 上的那條記錄",
+    skip: "點任意處跳過",
+    noteAllRedacted: "全都塗黑了。留一個欄位不塗，才有東西可證明。",
+    noteProving: (f) => `正在證明 ${f}。其餘全部留在這台裝置上——不傳送，連加密後也不傳送。`,
+    anchorLine: "ANCHOR 是 Cardano 主網上一張真實 EchoCert 憑證的資產名，2026-04-11 鑄造——它本身就是那張憑證內容的 SHA-256，正好 32 位元組。",
+    anchorLink: "去鏈上查 →",
+    forgeHint: "這張文憑從來沒有被簽發過。DEGREE 欄位上寫什麼，全憑持有人自己填。",
+    proverLive: "由本地 PROOF SERVER 出證",
+    proverReplay: "回放一次真實運行測得的耗時——這個頁面本身沒有證明器。",
+    rejectHint: "一張從未簽發的憑證不存在任何證明。沒有東西可提交，鏈上也沒有東西可查。",
+    verdictOk: "✓ 有效 — 文憑是真的",
+  },
+  ja: {
+    s1: "同じ証明書、二つのかたち",
+    s2: "証明書 · 項目をクリックして手元に残す",
+    s3: "証明",
+    s4: "三つの検証者 · どれも見分けられない",
+    s5: "チェーンに実際に見えるもの",
+    before: "公開の証明書レジストリ、すでに稼働中。誰でも学位を検証できる——そして全ての項目を読める。検証可能性はプライバシーと引き換えだった。",
+    after: "同じ証明書を、一項目ずつ証明する。検証者は学位が本物だと分かるだけで、他は何も分からない——二つの証明を同一人物に結びつけることもできない。",
+    btnProve: "選んだ項目を証明",
+    btnForge: "偽造した学位で試す",
+    btnForgeBack: "本物の学位に戻す",
+    btnReset: "リセット",
+    btnThree: "三校すべてに証明する",
+    threeIntro: "Chuck は三つの大学に同時に出願し、それぞれに同じ学位を証明する。三つの独立した証明、三つの独立したトランザクション。この三つを結びつけるものは何もない。",
+    chainHint: "このパネルは公開 Midnight インデクサへの単なる HTTP POST。ウォレットも SDK も不要、秘密には一切触れない。同じクエリは誰でも実行できる。",
+    motto: "すべては簡潔のために",
+    footNote: "MLH Midnight ハッカソンのために制作、2026 · Charles Tao",
+    footAnchor: "Cardano 上のレコード",
+    skip: "クリックでスキップ",
+    noteAllRedacted: "すべて伏せてある。証明するには一つだけ開けておく。",
+    noteProving: (f) => `${f} を証明中。他はすべてこの端末に残る——送信されない、暗号化してさえ送らない。`,
+    anchorLine: "ANCHOR は Cardano メインネット上の実在する EchoCert 証明書のアセット名（2026-04-11 発行）。その証明書の内容の SHA-256 そのもので、ちょうど 32 バイト。",
+    anchorLink: "チェーンで確認 →",
+    forgeHint: "この学位は一度も発行されていない。DEGREE 欄には持ち主が書きたいことが書いてあるだけ。",
+    proverLive: "ローカル PROOF SERVER で証明中",
+    proverReplay: "実際の実行で測定した所要時間を再生している——このページ自体に証明器はない。",
+    rejectHint: "発行されていない証明書に、証明は存在しない。送信するものも、チェーンで確認するものもない。",
+    verdictOk: "✓ 有効 — 学位は本物",
+  },
+};
+
+let lang = "en";
+try {
+  const saved = localStorage.getItem("echocert-lang");
+  if (saved && I18N[saved]) lang = saved;
+  else if (/^zh\b/i.test(navigator.language)) lang = /hant|tw|hk|mo/i.test(navigator.language) ? "tw" : "zh";
+  else if (/^ja\b/i.test(navigator.language)) lang = "ja";
+} catch { /* private window */ }
+
+const t = (key, ...args) => {
+  const v = I18N[lang]?.[key] ?? I18N.en[key];
+  return typeof v === "function" ? v(...args) : v;
+};
+
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-i18n]")) {
+    const v = t(el.dataset.i18n);
+    if (v) el.textContent = v;
+  }
+  // forge button carries state, so it is set from whichever label applies
+  const forgeBtn = $("btn-forge");
+  if (forgeBtn) forgeBtn.textContent = forging ? t("btnForgeBack") : t("btnForge");
+  const anchorLine = $("anchor-line");
+  if (anchorLine) {
+    anchorLine.innerHTML = `${t("anchorLine")} <a href="${CARDANO_URL}" target="_blank" rel="noopener">${t("anchorLink")}</a>`;
+  }
+  renderCredential();
+  for (const b of document.querySelectorAll("#lang-switch button")) {
+    b.setAttribute("aria-current", String(b.dataset.lang === lang));
+  }
+}
+
+function buildLanguageSwitch() {
+  const box = $("lang-switch");
+  box.innerHTML = "";
+  for (const [code, label] of Object.entries(LANGS)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.lang = code;
+    b.textContent = label;
+    b.addEventListener("click", () => {
+      lang = code;
+      try { localStorage.setItem("echocert-lang", code); } catch { /* ignore */ }
+      applyLanguage();
+    });
+    box.appendChild(b);
+  }
+}
+
 // --- credential rendering --------------------------------------------------
 
 function renderCredential() {
@@ -120,17 +299,9 @@ function renderCredential() {
     grid.appendChild(row);
   }
   const open = FIELDS.filter((f) => !f.redacted);
-  const anchorLine = $("anchor-line");
-  if (anchorLine && !anchorLine.dataset.filled) {
-    anchorLine.innerHTML =
-      `ANCHOR is the asset name of a real EchoCert credential on Cardano mainnet, minted 2026-04-11 — ` +
-      `which is the SHA-256 of that credential's contents, already 32 bytes. ` +
-      `<a href="${CARDANO_URL}" target="_blank" rel="noopener">Look it up →</a>`;
-    anchorLine.dataset.filled = "1";
-  }
   $("cred-note").textContent = open.length === 0
-    ? "Everything is redacted. Leave one field open to prove it."
-    : `Proving ${open.map((f) => f.key).join(", ")}. Everything else stays on this device — it is never sent, not even encrypted.`;
+    ? t("noteAllRedacted")
+    : t("noteProving", open.map((f) => f.key).join(", "));
   $("btn-prove").disabled = busy || open.length !== 1;
 }
 
@@ -185,8 +356,7 @@ async function prove() {
     outRow("REJECTED BY", "your own device");
     outRow("REACHED THE NETWORK", "no — the circuit refused to produce a proof");
     outRow("WHY", "the Merkle path proves a commitment this credential does not hash to");
-    $("prover-hint").textContent =
-      "No proof exists for a credential that was never issued. There is nothing to submit and nothing to check on chain.";
+    $("prover-hint").textContent = t("rejectHint");
     busy = false;
     $("btn-forge").disabled = false;
     renderCredential();
@@ -194,8 +364,7 @@ async function prove() {
   }
 
   setState("PROVING", "proving");
-  $("prover-hint").textContent =
-    mode === "LIVE" ? "PROVING VIA LOCAL PROOF SERVER" : "Replaying timings measured on a real run — this page has no prover.";
+  $("prover-hint").textContent = mode === "LIVE" ? t("proverLive") : t("proverReplay");
   const stopProve = startClock();
 
   let result;
@@ -232,7 +401,7 @@ async function prove() {
   outRow("CONTRACT", result.contractAddress ?? RECORDED.contractAddress);
   const verdict = document.createElement("p");
   verdict.className = "verdict ok";
-  verdict.textContent = "✓ VALID — the diploma is real";
+  verdict.textContent = t("verdictOk");
   $("proof-out").appendChild(verdict);
   outRow("VERIFIER LEARNED", `${field.key} only`);
   outRow("VERIFIER DID NOT LEARN", FIELDS.filter((f) => f.redacted).map((f) => f.key).join(", "));
@@ -305,17 +474,15 @@ $("btn-prove").addEventListener("click", () => { play("press"); return prove().c
 }); });
 $("btn-forge").addEventListener("click", () => {
   forging = !forging;
-  $("btn-forge").textContent = forging ? "Back to the real diploma" : "Try it with a forged diploma";
+  $("btn-forge").textContent = forging ? t("btnForgeBack") : t("btnForge");
   $("proof-out").innerHTML = "";
-  $("prover-hint").textContent = forging
-    ? "This diploma was never issued. The DEGREE field says whatever its holder wants it to say."
-    : "";
+  $("prover-hint").textContent = forging ? t("forgeHint") : "";
   setState("DRAFT", null);
   renderCredential();
 });
 $("btn-reset").addEventListener("click", () => {
   forging = false;
-  $("btn-forge").textContent = "Try it with a forged diploma";
+  $("btn-forge").textContent = t("btnForge");
   FIELDS.forEach((f) => { f.redacted = f.key !== "DEGREE"; });
   $("proof-out").innerHTML = "";
   $("prover-hint").textContent = "";
@@ -333,7 +500,8 @@ muteBtn.addEventListener("click", () => {
 });
 paintMute();
 
-renderCredential();
+buildLanguageSwitch();
+applyLanguage();
 setState("DRAFT", null);
 detectMode().then(() => { runBoot(); return readChain(); });
 

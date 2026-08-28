@@ -6,7 +6,7 @@
 <title>EchoCert on Midnight — prove one field, reveal nothing else</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400&family=Noto+Sans+TC:wght@400&family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
     <pre class="boot-mark" id="boot-mark"></pre>
     <div id="boot-checks"></div>
   </div>
-  <p class="boot-skip">click anywhere to skip</p>
+  <p class="boot-skip" data-i18n="skip">click anywhere to skip</p>
 </div>
 
 <div class="wrap">
@@ -32,6 +32,7 @@
     </div>
     <div class="spacer"></div>
     <span class="badge" id="network-badge">PREPROD</span>
+    <span class="badge lang-switch" id="lang-switch"></span>
     <button class="badge" id="btn-mute" style="cursor:pointer;font-family:inherit;background:transparent;">SOUND ON</button>
     <span class="badge" id="mode-badge"><span class="dot replay"></span><span id="mode-text">CHECKING…</span></span>
   </header>
@@ -40,7 +41,7 @@
   <section class="section">
     <div class="section-head">
       <span class="section-num">[ 01 ]</span>
-      <span class="label-tech">THE SAME CREDENTIAL, TWO WAYS</span>
+      <span class="label-tech" data-i18n="s1">THE SAME CREDENTIAL, TWO WAYS</span>
       <span class="section-rule"></span>
     </div>
     <div class="two-lines">
@@ -49,16 +50,14 @@
         <span class="corner bl"></span><span class="corner br"></span>
         <span class="line-tag">BEFORE</span>
         <h3>EchoCert on Cardano</h3>
-        <p>A public credential registry, live today. Anyone can verify a diploma — and
-           anyone can read every field of it. Verifiability came at the price of privacy.</p>
+        <p data-i18n="before">A public credential registry, live today. Anyone can verify a diploma — and anyone can read every field of it. Verifiability came at the price of privacy.</p>
       </div>
       <div class="panel line-panel">
         <span class="corner tl"></span><span class="corner tr"></span>
         <span class="corner bl"></span><span class="corner br"></span>
         <span class="line-tag">AFTER</span>
         <h3>EchoCert on Midnight</h3>
-        <p>The same credential, proved one field at a time. The verifier learns that the
-           diploma is real and nothing else — and cannot link two proofs to one holder.</p>
+        <p data-i18n="after">The same credential, proved one field at a time. The verifier learns that the diploma is real and nothing else — and cannot link two proofs to one holder.</p>
       </div>
     </div>
   </section>
@@ -67,7 +66,7 @@
   <section class="section">
     <div class="section-head">
       <span class="section-num">[ 02 ]</span>
-      <span class="label-tech">THE CREDENTIAL · CLICK A FIELD TO KEEP IT HOME</span>
+      <span class="label-tech" data-i18n="s2">THE CREDENTIAL · CLICK A FIELD TO KEEP IT HOME</span>
       <span class="section-rule"></span>
     </div>
     <div class="panel">
@@ -83,7 +82,7 @@
   <section class="section">
     <div class="section-head">
       <span class="section-num">[ 03 ]</span>
-      <span class="label-tech">PROVE</span>
+      <span class="label-tech" data-i18n="s3">PROVE</span>
       <span class="section-rule"></span>
     </div>
     <div class="panel">
@@ -100,9 +99,9 @@
       <div class="out" id="proof-out"></div>
 
       <div class="btn-row">
-        <button class="btn" id="btn-prove">Prove selected field</button>
-        <button class="btn ghost" id="btn-forge">Try it with a forged diploma</button>
-        <button class="btn ghost" id="btn-reset">Reset</button>
+        <button class="btn" id="btn-prove" data-i18n="btnProve">Prove selected field</button>
+        <button class="btn ghost" id="btn-forge" data-i18n="btnForge">Try it with a forged diploma</button>
+        <button class="btn ghost" id="btn-reset" data-i18n="btnReset">Reset</button>
       </div>
       <p class="hint" id="prover-hint"></p>
     </div>
@@ -112,17 +111,16 @@
   <section class="section">
     <div class="section-head">
       <span class="section-num">[ 04 ]</span>
-      <span class="label-tech">THREE VERIFIERS · NONE OF THEM CAN TELL</span>
+      <span class="label-tech" data-i18n="s4">THREE VERIFIERS · NONE OF THEM CAN TELL</span>
       <span class="section-rule"></span>
     </div>
     <div class="panel">
       <span class="corner tl"></span><span class="corner tr"></span>
       <span class="corner bl"></span><span class="corner br"></span>
-      <p class="cred-note">Chuck applies to three universities and proves the same degree to each.
-        Three separate proofs, three separate transactions. Nothing in them ties the three together.</p>
+      <p class="cred-note" data-i18n="threeIntro">Chuck applies to three universities and proves the same degree to each. Three separate proofs, three separate transactions. Nothing in them ties the three together.</p>
       <div class="verifiers" id="verifiers"></div>
       <div class="btn-row">
-        <button class="btn" id="btn-three">Prove to all three</button>
+        <button class="btn" id="btn-three" data-i18n="btnThree">Prove to all three</button>
       </div>
       <div class="out" id="link-out"></div>
     </div>
@@ -132,7 +130,7 @@
   <section class="section">
     <div class="section-head">
       <span class="section-num">[ 05 ]</span>
-      <span class="label-tech">WHAT THE CHAIN ACTUALLY SHOWS</span>
+      <span class="label-tech" data-i18n="s5">WHAT THE CHAIN ACTUALLY SHOWS</span>
       <span class="section-rule"></span>
     </div>
     <div class="panel">
@@ -141,12 +139,24 @@
       <div class="out" id="chain-out">
         <p class="mono-code">Reading the public indexer…</p>
       </div>
-      <p class="hint">This panel is a plain HTTP POST to the public Midnight indexer — no wallet,
-        no SDK, nothing private. Anyone can run the same query.</p>
+      <p class="hint" data-i18n="chainHint">This panel is a plain HTTP POST to the public Midnight indexer — no wallet, no SDK, nothing private. Anyone can run the same query.</p>
     </div>
   </section>
 
 </div>
+
+<footer class="foot">
+  <div class="foot-mark">
+    <span class="brand-box">ECHOFORGE</span>
+    <span class="foot-motto" data-i18n="motto">ALL FOR SIMPLE</span>
+  </div>
+  <div class="foot-links">
+    <a href="https://m.echoforgeef.com" target="_blank" rel="noopener">m.echoforgeef.com</a>
+    <a href="https://cardanoscan.io/token/32fd4d6013971be1074d83dc9b4ae3f9512184f10bfad9d1b8e7a158ea51c2a4c15251e0b663af71439a21ff4a2ea3b762c4efd3a044afb258bed978" target="_blank" rel="noopener" data-i18n="footAnchor">the Cardano record</a>
+  </div>
+  <p class="foot-note" data-i18n="footNote">Built for the MLH Midnight Hackathon, 2026 · Charles Tao</p>
+</footer>
+
 <script src="demo.js"></script>
 </body>
 </html>
