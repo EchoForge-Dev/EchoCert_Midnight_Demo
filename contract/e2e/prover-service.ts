@@ -97,7 +97,19 @@ async function main() {
   );
 
   console.log(`[prover] network=${NETWORK} — building wallet…`);
-  const wallet = await MidnightWalletProvider.build(logger, ENV, SEED);
+  let wallet: MidnightWalletProvider;
+  if (NETWORK === "preprod") {
+    // Preprod cold syncs OOM; restore from the resumable sync's checkpoints.
+    const { ZswapSecretKeys, DustSecretKey } = await import("@midnight-ntwrk/midnight-js-protocol/ledger");
+    const { buildOrRestoreFacade } = await import("./sync-preprod.js");
+    const { facade, seeds, keystore } = await buildOrRestoreFacade(SEED);
+    wallet = await MidnightWalletProvider.withWallet(
+      logger, ENV, facade as any,
+      ZswapSecretKeys.fromSeed(seeds.shielded), DustSecretKey.fromSeed(seeds.dust), keystore as any,
+    );
+  } else {
+    wallet = await MidnightWalletProvider.build(logger, ENV, SEED);
+  }
   await wallet.wallet.start(wallet.zswapSecretKeys, wallet.dustSecretKey);
   console.log("[prover] syncing wallet (a cold preprod sync takes over an hour)…");
   await wallet.wallet.waitForSyncedState();

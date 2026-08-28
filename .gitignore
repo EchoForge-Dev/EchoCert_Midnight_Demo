@@ -21,3 +21,7 @@ contract/logs/
 
 # Local prover deployment state — contains an issuer secret
 contract/e2e/.deployment-*.json
+
+# Resumable wallet sync checkpoints — contain wallet state, never commit
+contract/e2e/.wallet-state-*/
+design/DESIGN.md

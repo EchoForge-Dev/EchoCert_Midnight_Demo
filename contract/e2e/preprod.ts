@@ -26,6 +26,8 @@ import { indexerPublicDataProvider } from "@midnight-ntwrk/midnight-js-indexer-p
 import { deployContract, findDeployedContract, getPublicStates } from "@midnight-ntwrk/midnight-js-contracts";
 import { DEFAULT_DUST_OPTIONS, MidnightWalletProvider, inMemoryPrivateStateProvider, type EnvironmentConfiguration } from "@midnight-ntwrk/testkit-js";
 
+import { ZswapSecretKeys, DustSecretKey } from "@midnight-ntwrk/midnight-js-protocol/ledger";
+import { buildOrRestoreFacade } from "./sync-preprod.js";
 import { Contract, ledger, pureCircuits } from "../build/contract/index.js";
 import { witnesses, createPrivateState, type EchoCertPrivateState, type HeldCredential } from "../src/witnesses.js";
 import { DEMO_CREDENTIAL } from "../src/credential.js";
@@ -129,7 +131,16 @@ async function main() {
   const summary: Record<string, unknown> = {};
 
   console.log("\n========== 1. wallet ==========");
-  const wallet = await timed("build wallet from MIDNIGHT_WALLET_SEED", () => MidnightWalletProvider.build(logger, ENV, SEED));
+  // Restores from e2e/.wallet-state-preprod checkpoints when they exist (run
+  // e2e/sync-preprod.sh first) — startup is then seconds, not an hour-long
+  // cold sync that no longer fits in memory.
+  const wallet = await timed("build wallet (checkpoint restore if available)", async () => {
+    const { facade, seeds, keystore } = await buildOrRestoreFacade(SEED!);
+    return MidnightWalletProvider.withWallet(
+      logger, ENV, facade as any,
+      ZswapSecretKeys.fromSeed(seeds.shielded), DustSecretKey.fromSeed(seeds.dust), keystore as any,
+    );
+  });
   await timed("start wallet sync", async () => {
     await wallet.wallet.start(wallet.zswapSecretKeys, wallet.dustSecretKey);
   });
