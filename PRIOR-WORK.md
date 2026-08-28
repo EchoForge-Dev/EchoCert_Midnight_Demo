@@ -19,11 +19,11 @@ The rule of thumb I held myself to: **prior work may be the "before" and the ass
 | Item | What it is | When | Where |
 |---|---|---|---|
 | **EchoCert (Cardano)** — the "before" | Shipped product: a public credential registry anchored on Cardano. Every field of a credential is public and verifiable by anyone. | since 2026-04-10, last change 2026-08-21 | echoforgeef.com · main repo `EchoForge`, `credential/` |
-| Brand & design system | `EchoForge.svg`, `EFB.svg`, EchoForgeStyle spec (`design/DESIGN.md`), Midnight landing draft (`design/EchoForge Midnight.dc.html`) | 2026-08-05 → 08-26 | `brand/`, `design/` |
+| Brand & design system | `EchoForge.svg`, `EFB.svg`, the EchoForgeStyle spec and a Midnight landing draft. The marks are in this repo; the spec and the draft are internal design documents and are kept out of it. | 2026-08-05 → 08-26 | `brand/`, `design/assets/` |
 | Sound library — uisfx | Third-party (MIT code / CC0 audio). Unmodified npm dependency, not vendored. | added 2026-08-21 | `package.json` |
 | Sound library — Kenney UI pack | Third-party CC0 audio, vendored unchanged. | added 2026-08-03 | `kenney/` |
 | Midnight knowledge base | `MIDNIGHT_KB.html` and the EchoMKB agent skill (separate public repo, installed here) | 2026-08-04 → 08-26 | `docs/MIDNIGHT_KB.html`, `.agents/skills/echomkb`, `skills-lock.json` |
-| Compact reference examples | 4 study contracts written while learning Compact (counter / age-credential / document-anchor / private-ballot) | 2026-08-05 | `examples/` |
+| Compact reference examples | 4 study contracts written while learning Compact (counter / age-credential / document-anchor / private-ballot). Declared for completeness; not included in this repo and not used by it. | 2026-08-05 | private workspace |
 | Principle diagram | `echocert-principle.svg` | 2026-08-21 | `docs/` |
 | Video storyboard | `VIDEO-SCRIPT.md` | 2026-08-22 → 08-26 | `docs/` |
 
@@ -48,7 +48,7 @@ declared as prior work, the "after" I am being judged on would be empty.
   demo, wallet-less live chain panel
 - Integration into the shipped product: a "Prove privately on Midnight →" entry point on the
   existing EchoCert page, so the "after" is reachable from the "before"
-- Deployment to m.echoforgeef.com, contract on preprod
+- Deployment to m.echoforgeef.com. The contract runs on a local devnet: a preprod deployment was attempted and abandoned (see README)
 - README with the BEFORE/AFTER comparison, this declaration, and the 2-minute video
 
 ## How this moved as fast as it did

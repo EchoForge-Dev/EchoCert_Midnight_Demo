@@ -1,7 +1,6 @@
 # Devpost draft
 
-Paste-ready copy for the submission form. Update the two ⟨MARKED⟩ spots after
-the preprod attempt resolves, and the video link when it exists.
+Paste-ready copy for the submission form. Update the video link and repo URL when they exist.
 
 ---
 
@@ -59,7 +58,7 @@ that record's asset name, and the demo links to it so you can check.
   than fall back to defaults (a zero-byte issuer secret would be forgeable by
   anyone).
 - **Real pipeline**: local proof server (PLONK), deploy/issue/prove on a
-  Midnight devnet ⟨AND PREPROD — update after the attempt⟩, wallet-less chain
+  Midnight devnet, wallet-less chain
   reads through the public indexer.
 - **The demo** is vanilla HTML/CSS/JS in my design system, with a LIVE mode
   (a local prover service generates real proofs behind the page) and an honest
@@ -82,8 +81,9 @@ that record's asset name, and the demo links to it so you can check.
 - **Preprod cold sync vs. 16 GB of RAM.** Syncing a wallet from genesis
   OOM-crashed Node at 4, 8 and 10 GB heaps. I built a resumable sync that
   checkpoints all three wallet states to disk every 40 s and restores after
-  every crash — progress is monotone even if every attempt dies. ⟨UPDATE WITH
-  OUTCOME⟩
+  every crash — progress is monotone even if every attempt dies. It got past halfway — and
+  then the machine kernel-panicked twice in twenty minutes while it ran, so I
+  stopped. The demo stands on a local devnet, and says so on screen.
 
 ## Accomplishments
 

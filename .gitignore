@@ -25,3 +25,8 @@ contract/e2e/.deployment-*.json
 # Resumable wallet sync checkpoints — contain wallet state, never commit
 contract/e2e/.wallet-state-*/
 design/DESIGN.md
+
+# Internal design documents and study contracts — declared in PRIOR-WORK.md, kept out of the public repo
+design/DESIGN.md
+design/EchoForge Midnight.dc.html
+examples/

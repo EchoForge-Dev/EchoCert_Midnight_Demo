@@ -109,6 +109,12 @@ Local devnet, proof server 8.1.0, real PLONK proofs:
 Proving time genuinely varies by more than 2×, so the demo animates until the
 promise resolves and never hard-codes a duration.
 
+Every figure above is from a local devnet. I attempted a preprod deployment:
+the wallet's cold sync of the public chain would not fit in memory, so I built
+a checkpoint-and-restore sync (`contract/e2e/sync-preprod.ts`) that got past the
+halfway mark — and then my machine kernel-panicked twice in twenty minutes while
+it ran. I stopped. The demo stands on the devnet and says so on screen.
+
 ### Unlinkability, as an experiment rather than a claim
 
 "Two proofs by the same holder cannot be linked" is easy to assert. So
@@ -164,7 +170,6 @@ DEFAULT_DUST_OPTIONS.additionalFeeOverhead = 1_000_000n;
 | `contract/e2e/prover-service.ts` | The demo's LIVE prover |
 | `demo/` | The demo page |
 | `PRIOR-WORK.md` | **What existed before the event, as the track requires — and how this moved as fast as it did** |
-| `examples/` | Four study contracts, written before the event while learning Compact |
 
 ## Versions
 
