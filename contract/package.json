@@ -5,11 +5,22 @@
   "scripts": {
     "build": "compact compile src/echocert.compact build",
     "build:fast": "compact compile --skip-zk src/echocert.compact build",
-    "test": "tsx test/run.ts"
+    "test": "tsx test/run.ts",
+    "e2e": "tsx e2e/devnet.ts"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",
-    "@midnight-ntwrk/onchain-runtime-v3": "3.0.0"
+    "@midnight-ntwrk/midnight-js-contracts": "4.1.1",
+    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.1.1",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "4.1.1",
+    "@midnight-ntwrk/midnight-js-network-id": "4.1.1",
+    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "4.1.1",
+    "@midnight-ntwrk/onchain-runtime-v3": "3.0.0",
+    "@midnight-ntwrk/testkit-js": "4.1.1",
+    "@types/ws": "8.18.1",
+    "pino": "10.3.1",
+    "rxjs": "7.8.2",
+    "ws": "8.18.1"
   },
   "devDependencies": {
     "@types/node": "22.10.5",

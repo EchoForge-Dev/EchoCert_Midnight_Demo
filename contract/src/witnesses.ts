@@ -3,7 +3,7 @@
 // Everything here runs on the user's own machine. Return values feed the
 // circuit as private inputs and never leave the device in the clear.
 
-import type { WitnessContext } from "@midnight-ntwrk/compact-runtime";
+import type { MerkleTreePath, WitnessContext } from "@midnight-ntwrk/compact-runtime";
 import { pureCircuits, type Ledger } from "../build/contract/index.js";
 
 export type Credential = {
@@ -83,11 +83,11 @@ export const witnesses = {
   /// Look up the Merkle path for the credential this holder actually has.
   /// The commitment is computed by the contract's own exported pure circuit,
   /// so the encoding can never drift from what the proving circuit expects.
-  credentialPath: ({ ledger, privateState }: WitnessContext<Ledger, EchoCertPrivateState>) => {
+  credentialPath: ({ ledger, privateState }: WitnessContext<Ledger, EchoCertPrivateState>): [EchoCertPrivateState, MerkleTreePath<Uint8Array>] => {
     const held = requireHeld(privateState);
     const commitment = pureCircuits.commitmentOf(held);
     const path = ledger.credentials.findPathForLeaf(commitment);
     if (path === undefined) throw new CredentialNotIssuedError();
-    return [privateState, path] as const;
+    return [privateState, path];
   },
 };

@@ -15,3 +15,6 @@ node_modules/
 build/
 dist/
 *.log
+
+# E2E run logs
+contract/logs/
