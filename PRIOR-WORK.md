@@ -51,6 +51,46 @@ declared as prior work, the "after" I am being judged on would be empty.
 - Deployment to m.echoforgeef.com, contract on preprod
 - README with the BEFORE/AFTER comparison, this declaration, and the 2-minute video
 
+## How this moved as fast as it did
+
+A solo entrant producing a working ZK application in the first hours of a
+hackathon invites an obvious suspicion: that the code was written beforehand.
+It was not, and rather than just assert that, here is the actual explanation.
+
+**A full rehearsal, declared above.** Between 2026-08-21 and 08-23 I built this
+same idea end to end, hit a wallet-SDK failure on preprod, spent two days
+localising it, and wrote it all down. None of that code is in this repository —
+what I carried in was a runbook: which versions to pin, which disclosure rules
+bite, which pitfalls cost me an afternoon. Rebuilding something you have already
+built once, from notes, is fast. That is what a rehearsal is for, and it is why
+I declared it instead of quietly reusing it.
+
+**Claude Code, throughout.** This project was built by pair-programming with
+Claude Code (Anthropic). Every design decision, every debugging session and
+every commit message in this repository came out of that collaboration. I am
+disclosing it because it is a material part of how the work got done, and
+because a reader deserves to know.
+
+**One person, no coordination.** No standups, no review latency, no merge
+conflicts.
+
+**A domain I already work in.** EchoCert on Cardano is my own shipped product.
+I did not have to learn what a credential registry is or what it needs to prove.
+
+### What the commit history shows that pre-written code would not
+
+Read `3da840a`. I had written "SHARED IDENTIFIER: none" into the demo without
+checking it. When I did check, the three proofs turned out to share a 41-byte
+run that another holder's proof did not contain — which, taken at face value,
+would have meant the central claim of this project was false. It took a further
+experiment to establish that the run was the Merkle root at proof time, and the
+claim survived, in a more precise form.
+
+Code written in advance does not leave that trail. Neither do the two OOM
+crashes still visible in the preprod work, nor the node error 117 that took a
+detour through the status-code tables. The history is the evidence, and it is
+all timestamped after the event began.
+
 ## Third-party licenses
 
 - uisfx — MIT (code), CC0 (audio)

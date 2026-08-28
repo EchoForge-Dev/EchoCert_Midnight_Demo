@@ -6,6 +6,9 @@ links two proofs to the same person.**
 Built for the MLH Midnight Hackathon, 2026-08-28 → 08-30, by Charles Tao (solo),
 in the **Integrate Midnight to Upgrade an Existing App** track.
 
+Built by pair-programming with Claude Code. What existed before the event, and
+why this moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
+
 ---
 
 ## The two lines
@@ -160,7 +163,7 @@ DEFAULT_DUST_OPTIONS.additionalFeeOverhead = 1_000_000n;
 | `contract/e2e/preprod.ts` | The same against public preprod |
 | `contract/e2e/prover-service.ts` | The demo's LIVE prover |
 | `demo/` | The demo page |
-| `PRIOR-WORK.md` | **What existed before the event, as the track requires** |
+| `PRIOR-WORK.md` | **What existed before the event, as the track requires — and how this moved as fast as it did** |
 | `examples/` | Four study contracts, written before the event while learning Compact |
 
 ## Versions
