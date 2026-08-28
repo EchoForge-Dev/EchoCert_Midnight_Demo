@@ -109,11 +109,26 @@ Local devnet, proof server 8.1.0, real PLONK proofs:
 Proving time genuinely varies by more than 2×, so the demo animates until the
 promise resolves and never hard-codes a duration.
 
-Every figure above is from a local devnet. I attempted a preprod deployment:
-the wallet's cold sync of the public chain would not fit in memory, so I built
-a checkpoint-and-restore sync (`contract/e2e/sync-preprod.ts`) that got past the
-halfway mark — and then my machine kernel-panicked twice in twenty minutes while
-it ran. I stopped. The demo stands on the devnet and says so on screen.
+### And on public preprod
+
+The same pipeline, against the public preprod network, 2026-08-28:
+
+| Step | Time |
+|---|---|
+| `deployContract` | 22.5 s |
+| `issue()` full pipeline | 22.7 s |
+| `proveDegree()` full pipeline | 18.7 s |
+| Wallet-less indexer read | 372 ms |
+
+Contract `4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b` ·
+issue tx `00f9dba9…ba10a51` · proveDegree tx `00eb3b27…d583ab`. Query the public
+indexer yourself: `contractAction(address)` at
+`https://indexer.preprod.midnight.network/api/v4/graphql`.
+
+Getting there took a checkpoint-and-restore wallet sync
+(`contract/e2e/sync-preprod.ts`) — a cold sync of the public chain no longer
+fits in memory — and two kernel panics that turned out to be Docker Desktop's
+VM, not the sync. The containers moved to OrbStack and the sync finished.
 
 ### Unlinkability, as an experiment rather than a claim
 
@@ -154,6 +169,14 @@ deploy and issue land, the read-only proof does not.
 ```ts
 DEFAULT_DUST_OPTIONS.additionalFeeOverhead = 1_000_000n;
 ```
+
+That one line also turned out to be the whole story behind a failure I had
+spent two days on before the event: on preprod, the identical proof transaction
+died inside the wallet — `Wallet.Other: unreachable`, a WASM panic in
+`dryRunFee` — eight times out of eight, while deploy and issue always landed.
+Same asymmetry, different crash: the pre-GA devnet node rejects the zero-fee
+transaction, the GA network's wallet path panics on it. With the overhead set,
+it lands in 18.7 s.
 
 ---
 

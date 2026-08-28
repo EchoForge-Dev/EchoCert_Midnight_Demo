@@ -58,7 +58,7 @@ that record's asset name, and the demo links to it so you can check.
   than fall back to defaults (a zero-byte issuer secret would be forgeable by
   anyone).
 - **Real pipeline**: local proof server (PLONK), deploy/issue/prove on a
-  Midnight devnet, wallet-less chain
+  Midnight devnet **and on public preprod**, wallet-less chain
   reads through the public indexer.
 - **The demo** is vanilla HTML/CSS/JS in my design system, with a LIVE mode
   (a local prover service generates real proofs behind the page) and an honest
@@ -81,9 +81,11 @@ that record's asset name, and the demo links to it so you can check.
 - **Preprod cold sync vs. 16 GB of RAM.** Syncing a wallet from genesis
   OOM-crashed Node at 4, 8 and 10 GB heaps. I built a resumable sync that
   checkpoints all three wallet states to disk every 40 s and restores after
-  every crash — progress is monotone even if every attempt dies. It got past halfway — and
-  then the machine kernel-panicked twice in twenty minutes while it ran, so I
-  stopped. The demo stands on a local devnet, and says so on screen.
+  every crash — progress is monotone even if every attempt dies. It got there — after two kernel panics that turned out to be Docker
+  Desktop's VM, not the sync (the containers moved to OrbStack). Deploy, issue
+  and proveDegree all landed on public preprod, 7/7 checks, and the fee fix
+  above turned out to be the root cause of a failure I had spent two days on
+  before the event.
 
 ## Accomplishments
 
@@ -110,4 +112,5 @@ verification path next to the public registry.
 React-free vanilla JS · IBM Plex Mono · Kenney CC0 audio
 
 **Links:** repo ⟨URL when pushed⟩ · live demo m.echoforgeef.com ⟨when deployed⟩ ·
-the Cardano anchor: cardanoscan.io/token/32fd4d60…bed978
+the Cardano anchor: cardanoscan.io/token/32fd4d60…bed978 ·
+preprod contract 4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b

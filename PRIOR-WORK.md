@@ -48,7 +48,7 @@ declared as prior work, the "after" I am being judged on would be empty.
   demo, wallet-less live chain panel
 - Integration into the shipped product: a "Prove privately on Midnight →" entry point on the
   existing EchoCert page, so the "after" is reachable from the "before"
-- Deployment to m.echoforgeef.com. The contract runs on a local devnet: a preprod deployment was attempted and abandoned (see README)
+- Deployment to m.echoforgeef.com; contract deployed and proving on public preprod (`4719d2f6…d0769b`)
 - README with the BEFORE/AFTER comparison, this declaration, and the 2-minute video
 
 ## How this moved as fast as it did

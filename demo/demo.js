@@ -26,10 +26,12 @@ let contractAddress = null;
 // Measured on a real run — replayed, never invented. Replaced with the preprod
 // figures once the contract is deployed there.
 const RECORDED = {
-  network: "local devnet",
-  contractAddress: "7d5cf32ff3c9c894726cba65e57ab64937b46963f2ba7365f5f856bfd0538bac",
-  issueTxId: "00ac48f8400ff875dcf83bf982c4dd86f7825c58af171037af2a3936267ea4cf13",
-  proveTxId: "00387dfdbf2ccff3c2b05ce41b9d5be3cf519fe19e244399e71e1bbf8dbeb5073a",
+  // A real run against PUBLIC preprod, 2026-08-28 17:33 ADT. Anyone can look
+  // these up on the preprod indexer — the chain panel below does exactly that.
+  network: "preprod",
+  contractAddress: "4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b",
+  issueTxId: "00f9dba950bb351ce75a1ab4a834f78d1c8961dd682244185fa402dd7dbba10a51",
+  proveTxId: "00eb3b27ce8aed78e6f5784fa1a64db944f78a8ec9094f4d181462b3d510d583ab",
   disclosed: "adaf0de221bad98cc3f92e6dd060518c120cc2a9880b853e38d366f9f8d92aba",
   provingMs: 2400,
   finalizeMs: 16300,
@@ -445,25 +447,24 @@ async function readChain() {
       return;
     }
 
-    // REPLAY: the demo contract runs on a local devnet, which the public
-    // internet cannot reach. Rather than query a public network for a contract
-    // that is not there and print "not found", do one honest live thing —
-    // fetch the public preprod indexer's chain tip, so the round trip and the
-    // block height are real — and label everything recorded as recorded.
+    // REPLAY: the recorded contract lives on PUBLIC preprod, so this is the
+    // very same query LIVE mode makes — against a contract anyone can look up.
+    // Only the proofs on this page are replayed; the chain read is live.
+    const query = `query($a: HexEncoded!) { contractAction(address: $a) { __typename address } }`;
     const res = await fetch(INDEXERS.preprod, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query: `{ block { height } }` }),
+      body: JSON.stringify({ query, variables: { a: RECORDED.contractAddress } }),
     });
     const json = await res.json();
     const ms = (performance.now() - t0).toFixed(0);
     box.innerHTML = "";
-    add("LIVE QUERY", "block { height } — public preprod indexer over plain HTTP, no wallet");
+    add("LIVE QUERY", "contractAction(address) — public preprod indexer over plain HTTP, no wallet");
+    add("NETWORK", "preprod — public");
     add("ROUND TRIP", ms + " ms — live, just now");
-    add("PREPROD TIP", json?.data?.block?.height != null ? `block ${json.data.block.height}` : "unavailable");
-    add("THIS CONTRACT", "runs on a local devnet — not deployed on preprod. Run the repo and this page goes LIVE.");
-    add("RECORDED CONTRACT", RECORDED.contractAddress);
-    add("RECORDED READ", "7 ms, wallet-less, against the devnet indexer");
+    const action = json?.data?.contractAction;
+    add("CONTRACT FOUND", action ? action.address : "not found");
+    add("PROOFS ON THIS PAGE", "replayed from a real run on this contract — run the repo and they go live");
     add("COMMITMENT ON CHAIN", "absent — the tree stores a hash of it, never the value");
     add("LINKABLE TO A HOLDER", "no — measured, see the unlinkability experiment");
   } catch (e) {
@@ -488,7 +489,7 @@ async function detectMode() {
     }
   } catch { /* no local prover — the deployed page always lands here */ }
   mode = "REPLAY";
-  $("network-badge").textContent = "LOCAL DEVNET · RECORDED";
+  $("network-badge").textContent = "PREPROD · RECORDED";
   $("mode-badge").innerHTML = '<span class="dot replay"></span><span>REPLAY</span>';
 }
 
