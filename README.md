@@ -204,3 +204,16 @@ runtime must match.
 ## Licence
 
 Apache-2.0. Third-party audio: uisfx (MIT / CC0), Kenney UI pack (CC0).
+
+## About the author
+
+I'm Charles Tao. I'm 14 — born in 2012 — and I compete with my parents'
+authorization, which MLH requires of entrants under 18. If the organisers need
+anything further from a guardian, it is available on request.
+
+The video ends on *"the forger is real — he built the system that caught him."*
+That is not a metaphor. The Charles in the story has no diploma, and neither do
+I; I'm years away from one. I built a public credential registry before I had a
+credential to put in it, and then a way to prove one without showing it. Judge
+the work by what the transactions show. The age is only why the story is told
+the way it is.
