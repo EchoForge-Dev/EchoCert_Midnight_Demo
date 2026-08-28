@@ -1,0 +1,142 @@
+pragma language_version 0.23;
+import CompactStandardLibrary;
+
+// EchoCert on Midnight — selective disclosure for an existing credential.
+//
+// The Cardano line (EchoCert) publishes a credential's every field to a
+// public registry. This contract is the same credential, proved one field
+// at a time, revealing nothing else — and leaving no public identifier
+// that would let two disclosures be linked to the same holder.
+//
+// Privacy design:
+//   - The credential lives only in the holder's witness. The ledger stores
+//     a commitment, and the commitment itself is hashed again by
+//     HistoricMerkleTree.insert() before it reaches the transcript.
+//   - Membership is proved with a ZK Merkle path, so a disclosure never
+//     names the leaf it is about.
+//   - HistoricMerkleTree, not MerkleTree: checkRoot() accepts prior roots,
+//     so issuing a new credential does not invalidate paths already held.
+
+/// One credential. Every field is a fixed-width hash computed off-chain by
+/// the DApp, so the circuit only ever handles fixed-size data.
+struct Credential {
+    subject: Bytes<32>;
+    degree: Bytes<32>;
+    issuer: Bytes<32>;
+    issuedYear: Uint<16>;
+    anchor: Bytes<32>;
+}
+
+/// A credential together with the nonce that binds its commitment. The
+/// issuer hands both to the holder out of band at issuance.
+struct HeldCredential {
+    credential: Credential;
+    nonce: Bytes<32>;
+}
+
+/// Public key of the issuer, derived from a secret only the issuer holds.
+export sealed ledger issuerKey: Bytes<32>;
+
+/// Commitments of every issued credential. Insert hides the leaf; the tree
+/// keeps historic roots so old paths stay provable.
+export ledger credentials: HistoricMerkleTree<10, Bytes<32>>;
+
+/// How many credentials were issued. Public on purpose — a registry should
+/// be able to say how big it is without saying who is in it.
+export ledger issuedCount: Counter;
+
+/// The issuer's signing secret. Never leaves the issuer's machine.
+witness issuerSecret(): Bytes<32>;
+
+/// The credential the issuer is about to issue.
+witness credentialToIssue(): HeldCredential;
+
+/// The credential the holder is proving something about.
+witness heldCredential(): HeldCredential;
+
+/// A Merkle path proving the held credential's commitment is in the tree.
+witness credentialPath(): MerkleTreePath<10, Bytes<32>>;
+
+constructor() {
+    // Publishing the issuer's public key is a deliberate disclosure of a
+    // hash of witness data, so disclose() is required here.
+    issuerKey = disclose(deriveIssuerKey(issuerSecret()));
+}
+
+/// Issue a credential. Authenticated inside the proof: the caller must know
+/// the secret behind issuerKey, and nothing about the credential is revealed.
+export circuit issue(): [] {
+    // Comparing a witness-derived key against the sealed key needs no
+    // disclosure — the comparison happens inside the circuit.
+    assert(deriveIssuerKey(issuerSecret()) == issuerKey, "caller is not the issuer");
+
+    const held = credentialToIssue();
+    // A commitment over witness data is safe to hand to a ledger sink.
+    credentials.insert(commitmentOf(held));
+    issuedCount.increment(1);
+}
+
+/// Prove the degree field, and only the degree field.
+export circuit proveDegree(): Bytes<32> {
+    return disclose(verifiedCredential().degree);
+}
+
+/// Prove which institution issued the credential, and nothing else.
+export circuit proveIssuer(): Bytes<32> {
+    return disclose(verifiedCredential().issuer);
+}
+
+/// Prove the subject the credential was issued to.
+export circuit proveSubject(): Bytes<32> {
+    return disclose(verifiedCredential().subject);
+}
+
+/// Prove the Cardano anchor this credential corresponds to — the field that
+/// ties a Midnight proof back to the public EchoCert record on Cardano.
+export circuit proveAnchor(): Bytes<32> {
+    return disclose(verifiedCredential().anchor);
+}
+
+/// Prove the year of issue.
+export circuit proveIssuedYear(): Uint<16> {
+    return disclose(verifiedCredential().issuedYear);
+}
+
+/// Shared verification for every prove* circuit: the holder really holds
+/// this credential, and it really was issued. Field selection happens in the
+/// callers, where it is a compile-time constant, so this folds away and no
+/// private branch is introduced.
+circuit verifiedCredential(): Credential {
+    const held = heldCredential();
+    const commitment = commitmentOf(held);
+    const path = credentialPath();
+
+    // Without this line the whole scheme is worthless: MerkleTreePath carries
+    // its own leaf, and both the path and the credential come from the same
+    // untrusted holder. Unbound, a forger pairs someone else's genuine path
+    // with a credential they made up, and the root check still passes.
+    assert(path.leaf == commitment, "path does not correspond to this credential");
+
+    assert(
+        credentials.checkRoot(disclose(merkleTreePathRoot<10, Bytes<32>>(path))),
+        "credential is not in the registry"
+    );
+
+    return held.credential;
+}
+
+/// Commitment binding a credential to its nonce. persistentCommit hides the
+/// witness data, which is why its output can cross into public state.
+///
+/// Exported and pure on purpose: the holder's DApp has to compute the very
+/// same commitment off-chain to look up its Merkle path, and reimplementing
+/// the struct encoding in TypeScript would silently break the day a field
+/// moves. Calling the compiled circuit costs nothing and cannot drift.
+export pure circuit commitmentOf(held: HeldCredential): Bytes<32> {
+    return persistentCommit<Credential>(held.credential, held.nonce);
+}
+
+/// The issuer's public key: a domain-separated hash of the issuer secret.
+circuit deriveIssuerKey(secret: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "echocert:issuer:v2"), secret]);
+}
