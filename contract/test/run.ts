@@ -12,6 +12,7 @@ import {
 } from "@midnight-ntwrk/compact-runtime";
 
 import { Contract, ledger, pureCircuits } from "../build/contract/index.js";
+import { DEMO_CREDENTIAL } from "../src/credential.js";
 import {
   witnesses,
   createPrivateState,
@@ -61,13 +62,8 @@ const ISSUER_SECRET = new Uint8Array(randomBytes(32));
 const WRONG_SECRET = new Uint8Array(randomBytes(32));
 
 const chuckNonce = nonce();
-const chuck: Credential = {
-  subject: field("did:echo:stickman-charles/chuck"),
-  degree: field("BSc Computer Science"),
-  issuer: field("Meridian Institute of Technology"),
-  issuedYear: 2026n,
-  anchor: field("cardano:echocert:anchor:chuck"),
-};
+// The same credential the demo uses, anchored to a real Cardano mainnet record.
+const chuck: Credential = DEMO_CREDENTIAL;
 const chuckHeld: HeldCredential = { credential: chuck, nonce: chuckNonce };
 
 // A second credential, issued later, to prove that issuing does not

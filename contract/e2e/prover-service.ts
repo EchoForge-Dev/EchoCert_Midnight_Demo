@@ -18,7 +18,7 @@ import { WebSocket } from "ws";
 globalThis.WebSocket = WebSocket;
 
 import { createServer } from "node:http";
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import pino from "pino";
 
@@ -32,6 +32,7 @@ import { DEFAULT_DUST_OPTIONS, MidnightWalletProvider, inMemoryPrivateStateProvi
 
 import { Contract } from "../build/contract/index.js";
 import { witnesses, createPrivateState, type EchoCertPrivateState, type HeldCredential } from "../src/witnesses.js";
+import { CARDANO_ANCHOR, DEMO_CREDENTIAL, DEMO_PLAINTEXT } from "../src/credential.js";
 
 // A read-only circuit computes a zero fee on an idle chain, which the ledger
 // rejects as not-normalized. See e2e/devnet.ts for the full explanation.
@@ -70,22 +71,11 @@ if (!SEED) {
 }
 
 const logger = pino({ level: "warn" });
-const field = (s: string): Uint8Array => new Uint8Array(createHash("sha256").update(s).digest());
 const hex = (b: Uint8Array): string => Buffer.from(b).toString("hex");
 
-// The credential the demo proves things about. Deterministic per deployment so
-// a restart keeps proving the same diploma.
+// Deterministic per deployment, so a restart keeps proving the same diploma.
 function credentialFor(nonceHex: string): HeldCredential {
-  return {
-    credential: {
-      subject: field("did:echo:stickman-charles/chuck"),
-      degree: field("BSc Computer Science"),
-      issuer: field("Meridian Institute of Technology"),
-      issuedYear: 2026n,
-      anchor: field("cardano:echocert:anchor:chuck"),
-    },
-    nonce: new Uint8Array(Buffer.from(nonceHex, "hex")),
-  };
+  return { credential: DEMO_CREDENTIAL, nonce: new Uint8Array(Buffer.from(nonceHex, "hex")) };
 }
 
 const CIRCUITS = ["proveDegree", "proveIssuer", "proveSubject", "proveAnchor", "proveIssuedYear"] as const;
@@ -176,6 +166,8 @@ async function main() {
         status: "ok", network: NETWORK,
         contractAddress: deployment.contractAddress,
         issueTxId: deployment.issueTxId,
+        cardanoAnchor: CARDANO_ANCHOR,
+        plaintext: DEMO_PLAINTEXT,
       }));
     }
 

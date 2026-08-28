@@ -35,14 +35,25 @@ const RECORDED = {
   finalizeMs: 16300,
 };
 
-// The credential. Field values are shown in the clear here because this is the
-// holder's own device — that is exactly the point being made.
+// A real EchoCert credential minted on Cardano mainnet on 2026-04-11. Its asset
+// name is the SHA-256 of the credential's contents, which is already 32 bytes —
+// so it drops straight into the contract's ANCHOR field. This is the join
+// between the two lines, and anyone can look it up.
+const CARDANO = {
+  policyId: "32fd4d6013971be1074d83dc9b4ae3f9512184f10bfad9d1b8e7a158",
+  assetName: "ea51c2a4c15251e0b663af71439a21ff4a2ea3b762c4efd3a044afb258bed978",
+  mintTx: "1e44e51c4dd9ba071a115c3c0c964ad6777d77d10b21001025dfc052ed4238fc",
+};
+const CARDANO_URL = `https://cardanoscan.io/token/${CARDANO.policyId}${CARDANO.assetName}`;
+
+// Field values are shown in the clear here because this is the holder's own
+// device — that is exactly the point being made.
 const FIELDS = [
   { key: "SUBJECT", value: "did:echo:stickman-charles/chuck", redacted: true },
   { key: "DEGREE", value: "BSc Computer Science", redacted: false },
   { key: "ISSUER", value: "Meridian Institute of Technology", redacted: true },
   { key: "ISSUED_YEAR", value: "2026", redacted: true },
-  { key: "ANCHOR", value: "cardano:echocert:anchor:chuck", redacted: true },
+  { key: "ANCHOR", value: CARDANO.assetName, redacted: true, truncate: true },
 ];
 
 const FORGED_DEGREE = "PhD Astrophysics";
@@ -63,7 +74,8 @@ function renderCredential() {
   for (const f of FIELDS) {
     const row = document.createElement("div");
     row.className = "field" + (f.redacted ? " redacted" : "");
-    const shown = forging && f.key === "DEGREE" ? FORGED_DEGREE : f.value;
+    let shown = forging && f.key === "DEGREE" ? FORGED_DEGREE : f.value;
+    if (f.truncate && shown.length > 24) shown = shown.slice(0, 12) + "…" + shown.slice(-8);
     // One block per character: the redaction covers the value without
     // pretending the value was never there.
     const blocks = "▮".repeat(Math.min(shown.length, 46));
@@ -79,6 +91,14 @@ function renderCredential() {
     grid.appendChild(row);
   }
   const open = FIELDS.filter((f) => !f.redacted);
+  const anchorLine = $("anchor-line");
+  if (anchorLine && !anchorLine.dataset.filled) {
+    anchorLine.innerHTML =
+      `ANCHOR is the asset name of a real EchoCert credential on Cardano mainnet, minted 2026-04-11 — ` +
+      `which is the SHA-256 of that credential's contents, already 32 bytes. ` +
+      `<a href="${CARDANO_URL}" target="_blank" rel="noopener">Look it up →</a>`;
+    anchorLine.dataset.filled = "1";
+  }
   $("cred-note").textContent = open.length === 0
     ? "Everything is redacted. Leave one field open to prove it."
     : `Proving ${open.map((f) => f.key).join(", ")}. Everything else stays on this device — it is never sent, not even encrypted.`;

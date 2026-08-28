@@ -24,7 +24,8 @@ import { deployContract, findDeployedContract, getPublicStates } from "@midnight
 import { DEFAULT_DUST_OPTIONS, MidnightWalletProvider, inMemoryPrivateStateProvider, type EnvironmentConfiguration } from "@midnight-ntwrk/testkit-js";
 
 import { Contract, ledger, pureCircuits } from "../build/contract/index.js";
-import { witnesses, createPrivateState, type Credential, type EchoCertPrivateState, type HeldCredential } from "../src/witnesses.js";
+import { witnesses, createPrivateState, type EchoCertPrivateState, type HeldCredential } from "../src/witnesses.js";
+import { DEMO_CREDENTIAL } from "../src/credential.js";
 
 // --- environment -----------------------------------------------------------
 
@@ -87,13 +88,7 @@ const check = (label: string, ok: boolean, detail = "") => {
 
 const ISSUER_SECRET = new Uint8Array(randomBytes(32));
 const chuckHeld: HeldCredential = {
-  credential: {
-    subject: field("did:echo:stickman-charles/chuck"),
-    degree: field("BSc Computer Science"),
-    issuer: field("Meridian Institute of Technology"),
-    issuedYear: 2026n,
-    anchor: field("cardano:echocert:anchor:chuck"),
-  },
+  credential: DEMO_CREDENTIAL,
   nonce: new Uint8Array(randomBytes(32)),
 };
 
