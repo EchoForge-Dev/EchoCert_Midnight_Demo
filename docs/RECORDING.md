@@ -5,19 +5,29 @@ below is real footage — nothing here is mocked.
 
 ## Before you start
 
+**Containers run under OrbStack, not Docker Desktop.** Docker Desktop's VM
+kernel-panicked this machine twice on 2026-08-28 under sustained network load
+(`com.docker.virtualization` was the panicked task both times). Quit Docker
+Desktop before recording; do not let it autostart.
+
 ```bash
-# 1. proof server
-docker start midnight-proof-server || docker run -d --name midnight-proof-server \
-  -p 6300:6300 midnightntwrk/proof-server:8.1.0 -- midnight-proof-server -v
-curl -sf localhost:6300/health
+# 0. make sure docker talks to OrbStack, and Docker Desktop is not running
+docker context use orbstack
+pgrep -fl "Docker Desktop" && echo "QUIT DOCKER DESKTOP FIRST"
 
-# 2. local devnet
-docker start midnight-node midnight-indexer
+# 1. proof server + local devnet (one compose file; images pull once)
+docker compose -f ~/.midnight-expert/devnet/devnet.yml up -d
+curl -sf localhost:6300/health                      # proof server
+curl -s -H 'content-type: application/json' \
+  -d '{"query":"{ block { height } }"}' localhost:8088/api/v4/graphql   # indexer
 
-# 3. the prover behind LIVE mode (deploys + issues on first run, ~40s)
+# 2. the prover behind LIVE mode (deploys + issues on first run, ~40s)
+#    A FRESH devnet has no contract yet: drop the prover's cached deployment
+#    first, or it will try to reuse an address that no longer exists.
+rm -f contract/e2e/.deployment-undeployed.json
 cd contract && npm run prover
 
-# 4. serve the page from the repo root, so ../kenney and ../design resolve
+# 3. serve the page from the repo root, so ../kenney and ../design resolve
 python3 -m http.server 8080
 ```
 
