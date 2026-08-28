@@ -9,6 +9,10 @@ in the **Integrate Midnight to Upgrade an Existing App** track.
 Built by pair-programming with Claude Code. What existed before the event, and
 why this moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
 
+**Live demo:** https://m.echoforgeef.com/echocert/ — proofs replayed from a real
+run on public preprod, chain panel live. Run the repo locally and the same page
+proves for real.
+
 ---
 
 ## The two lines

@@ -1,6 +1,6 @@
 # Devpost draft
 
-Paste-ready copy for the submission form. Update the video link and repo URL when they exist.
+Paste-ready copy for the submission form. Update the video link when it exists.
 
 ---
 
@@ -111,6 +111,6 @@ verification path next to the public registry.
 **Built with:** Compact 0.31.1 · midnight-js 4.1.1 · proof server 8.1.0 ·
 React-free vanilla JS · IBM Plex Mono · Kenney CC0 audio
 
-**Links:** repo https://github.com/EchoForge-Dev/EchoCert_Midnight_Demo · live demo m.echoforgeef.com/echocert/ ⟨when deployed⟩ ·
+**Links:** repo https://github.com/EchoForge-Dev/EchoCert_Midnight_Demo · live demo https://m.echoforgeef.com/echocert/ ·
 the Cardano anchor: cardanoscan.io/token/32fd4d60…bed978 ·
 preprod contract 4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b
