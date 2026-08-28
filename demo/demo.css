@@ -1,0 +1,172 @@
+/* EchoForgeStyle — Midnight edition. Monochrome, IBM Plex Mono, glass, corner
+   markers. Colour appears only where the design system sanctions it: green for
+   a verified proof, yellow for crossing a privacy boundary. */
+
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #0A0A0A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #808080;
+  --border-color: #262626;
+  --glass-bg: rgba(0, 0, 0, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --success: #4EDE80;
+  --disclose: #EAB308;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* --- type ---------------------------------------------------------------- */
+
+.label-tech {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.value-tech { font-size: 14px; letter-spacing: 0.02em; }
+.mono-code { font-size: 12px; color: var(--text-secondary); word-break: break-all; }
+
+/* --- glass + corners ----------------------------------------------------- */
+
+.panel {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  padding: 20px;
+}
+.corner { position: absolute; width: 10px; height: 10px; }
+.corner.tl { top: 6px; left: 6px; border-top: 1px solid rgba(128,128,128,0.3); border-left: 1px solid rgba(128,128,128,0.3); }
+.corner.tr { top: 6px; right: 6px; border-top: 1px solid rgba(128,128,128,0.3); border-right: 1px solid rgba(128,128,128,0.3); }
+.corner.bl { bottom: 6px; left: 6px; border-bottom: 1px solid rgba(128,128,128,0.3); border-left: 1px solid rgba(128,128,128,0.3); }
+.corner.br { bottom: 6px; right: 6px; border-bottom: 1px solid rgba(128,128,128,0.3); border-right: 1px solid rgba(128,128,128,0.3); }
+
+/* --- header -------------------------------------------------------------- */
+
+header {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 12px 0 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 28px;
+}
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-box {
+  border: 1px solid var(--text-primary); padding: 3px 8px;
+  font-size: 11px; letter-spacing: 0.18em;
+}
+.brand-sub { font-size: 11px; letter-spacing: 0.18em; color: var(--text-secondary); }
+.spacer { flex: 1; }
+.badge {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  border: 1px solid var(--border-color); padding: 3px 8px; color: var(--text-secondary);
+}
+.badge .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.dot.live { background: var(--success); animation: breathe 2s ease-in-out infinite; }
+.dot.replay { background: var(--text-secondary); }
+
+@keyframes breathe { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+/* --- section scaffolding ------------------------------------------------- */
+
+.section { margin-bottom: 36px; }
+.section-head {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.section-num { font-size: 10px; letter-spacing: 0.14em; color: var(--text-secondary); }
+.section-rule { flex: 1; border-top: 1px dashed var(--border-color); }
+
+/* --- before / after ------------------------------------------------------ */
+
+.two-lines { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .two-lines { grid-template-columns: 1fr; } }
+
+.line-tag {
+  position: absolute; top: 0; left: 0;
+  font-size: 10px; letter-spacing: 0.18em; padding: 4px 10px;
+  background: var(--text-primary); color: var(--bg-primary);
+}
+.line-panel { padding-top: 38px; }
+.line-panel h3 { font-size: 13px; font-weight: 400; letter-spacing: 0.06em; margin-bottom: 4px; }
+.line-panel p { font-size: 12px; color: var(--text-secondary); }
+
+/* --- credential ---------------------------------------------------------- */
+
+.cred-grid { display: grid; gap: 2px; }
+.field {
+  display: grid; grid-template-columns: 190px 1fr auto; gap: 14px; align-items: center;
+  padding: 11px 12px; border: 1px solid transparent; background: rgba(255,255,255,0.02);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.field:hover { border-color: rgba(255,255,255,0.15); }
+.field.locked { cursor: not-allowed; opacity: 0.75; }
+/* Redaction reads as blocks, the same mark the brand uses for "All for ▮▮▮▮".
+   The blocks take the width of the text they cover, so the shape of what is
+   hidden stays visible while the content does not. */
+.field-value { position: relative; }
+.field-value .text { transition: opacity 0.16s ease; }
+.field-value .blocks {
+  position: absolute; inset: 0; display: flex; align-items: center;
+  letter-spacing: -0.06em; color: rgba(255,255,255,0.55);
+  opacity: 0; transition: opacity 0.16s ease; pointer-events: none;
+}
+.field.redacted .text { opacity: 0; }
+.field.redacted .blocks { opacity: 1; }
+
+.scope { font-size: 10px; letter-spacing: 0.1em; white-space: nowrap; }
+.scope.local { color: var(--text-secondary); }
+.scope.public { color: var(--disclose); }
+
+.cred-note { margin-top: 12px; font-size: 11px; color: var(--text-secondary); }
+
+/* --- buttons ------------------------------------------------------------- */
+
+.btn {
+  font-family: inherit; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  background: transparent; color: var(--text-primary);
+  border: 1px solid var(--text-primary); padding: 11px 22px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn:hover:not(:disabled) { background: var(--text-primary); color: var(--bg-primary); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn.ghost { border-color: var(--border-color); color: var(--text-secondary); }
+.btn.ghost:hover:not(:disabled) { background: var(--border-color); color: var(--text-primary); }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+
+/* --- proof lifecycle ----------------------------------------------------- */
+
+.state-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.state-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-secondary); flex: none; }
+.state-dot.proving { background: var(--text-primary); animation: breathe 1.4s ease-in-out infinite; }
+.state-dot.confirmed { background: var(--success); animation: breathe 2s ease-in-out infinite; }
+.state-dot.failed { background: var(--disclose); animation: pulse 0.8s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.state-label { font-size: 11px; letter-spacing: 0.16em; }
+.state-elapsed { margin-left: auto; font-size: 11px; color: var(--text-secondary); }
+
+/* proving: an indeterminate scan, never a fake percentage */
+.scan { height: 2px; background: var(--border-color); overflow: hidden; margin-bottom: 14px; }
+.scan i { display: block; height: 100%; width: 34%; background: var(--text-primary); transform: translateX(-100%); }
+.scan.on i { animation: scan 1.9s ease-in-out infinite; }
+@keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
+
+.out { display: grid; gap: 10px; }
+.out-row { display: grid; grid-template-columns: 190px 1fr; gap: 14px; align-items: baseline; }
+@media (max-width: 640px) { .out-row, .field { grid-template-columns: 1fr; } }
+
+.verdict { font-size: 20px; letter-spacing: 0.06em; }
+.verdict.ok { color: var(--success); }
+.verdict.no { color: var(--disclose); }
+
+.hint { font-size: 11px; color: var(--text-secondary); margin-top: 10px; }
+a { color: var(--text-primary); }

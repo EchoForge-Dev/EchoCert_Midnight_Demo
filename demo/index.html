@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EchoCert on Midnight — prove one field, reveal nothing else</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="brand-box">ECHOFORGE</span>
+      <span class="brand-sub">ECHOCERT · MIDNIGHT</span>
+    </div>
+    <div class="spacer"></div>
+    <span class="badge" id="network-badge">PREPROD</span>
+    <span class="badge" id="mode-badge"><span class="dot replay"></span><span id="mode-text">CHECKING…</span></span>
+  </header>
+
+  <!-- [01] the two lines — the track asks for BEFORE and AFTER, so they lead -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">[ 01 ]</span>
+      <span class="label-tech">THE SAME CREDENTIAL, TWO WAYS</span>
+      <span class="section-rule"></span>
+    </div>
+    <div class="two-lines">
+      <div class="panel line-panel">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <span class="line-tag">BEFORE</span>
+        <h3>EchoCert on Cardano</h3>
+        <p>A public credential registry, live today. Anyone can verify a diploma — and
+           anyone can read every field of it. Verifiability came at the price of privacy.</p>
+      </div>
+      <div class="panel line-panel">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <span class="line-tag">AFTER</span>
+        <h3>EchoCert on Midnight</h3>
+        <p>The same credential, proved one field at a time. The verifier learns that the
+           diploma is real and nothing else — and cannot link two proofs to one holder.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- [02] the credential itself -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">[ 02 ]</span>
+      <span class="label-tech">THE CREDENTIAL · CLICK A FIELD TO KEEP IT HOME</span>
+      <span class="section-rule"></span>
+    </div>
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <div class="cred-grid" id="cred-grid"></div>
+      <p class="cred-note" id="cred-note"></p>
+    </div>
+  </section>
+
+  <!-- [03] prove -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">[ 03 ]</span>
+      <span class="label-tech">PROVE</span>
+      <span class="section-rule"></span>
+    </div>
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+
+      <div class="state-row">
+        <span class="state-dot" id="state-dot"></span>
+        <span class="state-label" id="state-label">DRAFT</span>
+        <span class="state-elapsed" id="state-elapsed"></span>
+      </div>
+      <div class="scan" id="scan"><i></i></div>
+
+      <div class="out" id="proof-out"></div>
+
+      <div class="btn-row">
+        <button class="btn" id="btn-prove">Prove selected field</button>
+        <button class="btn ghost" id="btn-forge">Try it with a forged diploma</button>
+        <button class="btn ghost" id="btn-reset">Reset</button>
+      </div>
+      <p class="hint" id="prover-hint"></p>
+    </div>
+  </section>
+
+  <!-- [04] verify + live chain -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">[ 04 ]</span>
+      <span class="label-tech">WHAT THE CHAIN ACTUALLY SHOWS</span>
+      <span class="section-rule"></span>
+    </div>
+    <div class="panel">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <div class="out" id="chain-out">
+        <p class="mono-code">Reading the public indexer…</p>
+      </div>
+      <p class="hint">This panel is a plain HTTP POST to the public Midnight indexer — no wallet,
+        no SDK, nothing private. Anyone can run the same query.</p>
+    </div>
+  </section>
+
+</div>
+<script src="demo.js"></script>
+</body>
+</html>
