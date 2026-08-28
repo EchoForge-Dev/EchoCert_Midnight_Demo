@@ -26,15 +26,16 @@ let contractAddress = null;
 // Measured on a real run — replayed, never invented. Replaced with the preprod
 // figures once the contract is deployed there.
 const RECORDED = {
-  // A real run against PUBLIC preprod, 2026-08-28 17:33 ADT. Anyone can look
-  // these up on the preprod indexer — the chain panel below does exactly that.
+  // Real proofs on PUBLIC preprod, 2026-08-28 ~17:40 ADT, made from this very
+  // page in LIVE mode. Anyone can look them up on the preprod indexer — the
+  // chain panel below does exactly that.
   network: "preprod",
-  contractAddress: "4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b",
-  issueTxId: "00f9dba950bb351ce75a1ab4a834f78d1c8961dd682244185fa402dd7dbba10a51",
-  proveTxId: "00eb3b27ce8aed78e6f5784fa1a64db944f78a8ec9094f4d181462b3d510d583ab",
+  contractAddress: "765054972171eeb1589d3a042123890cd4291d7eaba4058e8e3a3416de0fada2",
+  issueTxId: "008a9e5d6e903022fe9692192d51ee20c454bd44ba9f53facb25465ec47f3f47ab",
+  proveTxId: "004a1ee8a588019869c4abe02f82471f56d02d30998601bd42d256f4cb3759dedb",
   disclosed: "adaf0de221bad98cc3f92e6dd060518c120cc2a9880b853e38d366f9f8d92aba",
   provingMs: 2400,
-  finalizeMs: 16300,
+  finalizeMs: 19100,
 };
 
 // A real EchoCert credential minted on Cardano mainnet on 2026-04-11. Its asset
@@ -543,12 +544,13 @@ detectMode().then(() => { runBoot(); return readChain(); });
 
 const VERIFIERS = ["Midnight University", "Cardano University", "EchoForge University"];
 
-// Three real proveDegree transactions from one holder, recorded on the local
-// devnet. Different transactions, same holder, no shared identifier.
+// Three real proveDegree transactions from one holder on public preprod, made
+// from this page's "Prove to all three" in LIVE mode. Same holder, three
+// different transactions, no shared identifier — see e2e/unlinkability.ts.
 const RECORDED_THREE = [
-  "00387dfdbf2ccff3c2b05ce41b9d5be3cf519fe19e244399e71e1bbf8dbeb5073a",
-  "004c2e36cf30edbaf69ca09374a36f334b6d37f3c2548c49822baaf2ab8fef964f",
-  "001d9748363a5de22ba914572cb373e6d9f351600ab5d16a46bee1f0a8bd0ba066",
+  "00ce1aa8280bd73842e58cab8c70c98aefa2bd8d011d55e387a5699465512574e5",
+  "00a799ab10b34d6c720f6c147cc217a3c1dda199c0494c9d7a690bb47abcaff853",
+  "00b4577a69d5b10b216ffdcdacc80b875d1683c75e6ef129310325c47dea1fdf95",
 ];
 
 function renderVerifiers(rows) {
