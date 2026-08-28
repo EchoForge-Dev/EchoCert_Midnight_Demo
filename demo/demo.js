@@ -69,11 +69,11 @@ const FORGED_DEGREE = "PhD Astrophysics";
 // Quiet by default, and muteable — a judge may well be watching in a library.
 
 const SFX = {
-  redact: "../kenney/Audio/switch2.ogg",
-  reveal: "../kenney/Audio/switch3.ogg",
-  press: "../kenney/Audio/click1.ogg",
-  ok: "../kenney/Audio/switch7.ogg",
-  fail: "../kenney/Audio/switch32.ogg",
+  redact: "assets/switch2.ogg",
+  reveal: "assets/switch3.ogg",
+  press: "assets/click1.ogg",
+  ok: "assets/switch7.ogg",
+  fail: "assets/switch32.ogg",
 };
 const audio = {};
 let muted = false;
@@ -667,7 +667,7 @@ async function runBoot() {
 
   // the brand mark, a line at a time
   try {
-    const res = await fetch("../design/assets/echo-mark-ascii.txt");
+    const res = await fetch("assets/echo-mark-ascii.txt");
     const lines = (await res.text()).split("\n").filter((l) => /[▀▄█]/.test(l));
     const mark = $("boot-mark");
     lines.forEach((line, i) => {

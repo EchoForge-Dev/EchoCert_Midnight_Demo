@@ -29,7 +29,7 @@ cd contract && MIDNIGHT_NETWORK=preprod MIDNIGHT_WALLET_SEED=… npm run prover
 #    Fallback, local devnet only (badge will read LOCAL DEVNET):
 #    rm -f e2e/.deployment-undeployed.json && npm run prover
 
-# 3. serve the page from the repo root, so ../kenney and ../design resolve
+# 3. serve the page (demo/ is self-contained — any static server, any path)
 python3 -m http.server 8080
 ```
 
