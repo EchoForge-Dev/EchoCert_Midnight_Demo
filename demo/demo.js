@@ -405,8 +405,12 @@ async function proveToAll() {
     $("link-out").appendChild(el);
   };
   add("TRANSACTIONS", `${new Set(txs).size} distinct`);
-  add("SHARED IDENTIFIER", "none — no commitment, no nullifier, no address in common");
   add("WHAT EACH SAW", "BSc Computer Science, and nothing else");
+  // Precise, because it was measured rather than asserted — see
+  // contract/e2e/unlinkability.ts, which tries to break this claim.
+  add("WHAT THEY SHARE", "the contract address, the circuit, and the tree root at proof time");
+  add("WHY THAT IS NOT A PERSON", "two different holders share exactly as much — 219 bytes either way");
+  add("THE HOLDER'S COMMITMENT", "appears in none of them");
   add("CAN THEY COMPARE NOTES", "yes — and still cannot tell it was one applicant");
 
   busy = false;

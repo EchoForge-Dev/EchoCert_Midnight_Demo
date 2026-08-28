@@ -77,6 +77,7 @@ npm test               # 17 checks, no network needed
 
 # 3. the full pipeline against a local devnet
 npm run e2e            # real proofs, real transactions, real chain reads
+npm run unlinkability  # tries to link two proofs by the same holder
 
 # 4. the demo, with live proving
 npm run prover         # deploys, issues, serves proofs on :8787
@@ -105,12 +106,31 @@ Local devnet, proof server 8.1.0, real PLONK proofs:
 Proving time genuinely varies by more than 2×, so the demo animates until the
 promise resolves and never hard-codes a duration.
 
-### Unlinkability, checked against the chain
+### Unlinkability, as an experiment rather than a claim
 
-After a real issue and a real proof, the raw commitment appears in **none** of:
-the issue transaction bytes, the proof transaction bytes, or the public ledger
-state. Verified with a positive control — `leafHash(commitment)` *is* found —
-so the search method is known to work.
+"Two proofs by the same holder cannot be linked" is easy to assert. So
+`contract/e2e/unlinkability.ts` tries to break it against a real chain, and
+reports what it finds:
+
+1. One holder proves the same field three times. What do the three transactions
+   share? Six runs of 16 bytes or more — the longest 219 bytes.
+2. A different holder proves against the same tree root. They share **219 bytes
+   too** — exactly as much. A shared run is therefore evidence of a common
+   contract, circuit and root, not of a common person.
+3. The tree moves on and the first holder proves again. Two of the six runs
+   vanish: those were the old Merkle root. Every run that *does* follow the
+   holder also appears in a different holder's proof, so every one of them is a
+   global constant.
+
+The credential's commitment appears in none of the transactions at any point.
+
+That third step is the one that matters. A value that followed the holder across
+a root change, and was not shared with anyone else, would be a linking
+identifier and the design would be broken. There is none.
+
+```
+NOTHING LINKS THE PROOFS
+```
 
 ---
 
@@ -136,6 +156,7 @@ DEFAULT_DUST_OPTIONS.additionalFeeOverhead = 1_000_000n;
 | `contract/src/witnesses.ts` | Holder and issuer private state |
 | `contract/test/run.ts` | 17 local checks including the forgery attack |
 | `contract/e2e/devnet.ts` | Full pipeline against a local devnet |
+| `contract/e2e/unlinkability.ts` | The experiment above — tries to link two proofs and fails |
 | `contract/e2e/preprod.ts` | The same against public preprod |
 | `contract/e2e/prover-service.ts` | The demo's LIVE prover |
 | `demo/` | The demo page |
