@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="media/card-before.png" alt="Midnight University. Two applicants." width="860">
+  <img src="media/card-title.png" alt="EchoCert Midnight — Charles and Chuck, two applicants to Midnight University" width="860">
 </p>
 
 <h1 align="center">EchoCert on Midnight</h1>
@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://m.echoforgeef.com/echocert/">Live demo</a> ·
-  <a href="⟨YouTube link⟩">Video (2:45)</a> ·
+  <a href="https://youtu.be/lyFPPHRT_iw">Video (2:45)</a> ·
   <a href="PRIOR-WORK.md">Prior-work declaration</a> ·
   <a href="#the-story-the-demo-tells">The story</a> ·
   <a href="#try-it">Try it</a>
@@ -29,7 +29,7 @@ moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
 
 **Live demo:** https://m.echoforgeef.com/echocert/ — proofs replayed from a real
 run on public preprod, chain panel live. Run the repo locally and the same page
-proves for real. **Video:** ⟨YouTube link⟩ — the captions are the narration; the
+proves for real. **Video:** https://youtu.be/lyFPPHRT_iw — the captions are the narration; the
 proving sequence is real time, landing on chain is the one sped-up shot and says so.
 
 ---
@@ -42,6 +42,8 @@ Midnight University. Two applicants.
 registry on Cardano — as a record anyone can verify. That is the BEFORE:
 verifiable, and entirely public. Admissions needs one field; the registry shows
 all five.
+
+<p align="center"><img src="media/card-before.png" alt="BEFORE — EchoCert on Cardano, public registry. Midnight University. Two applicants." width="860"></p>
 
 <p align="center"><img src="media/demo-credential.png" alt="The credential: five fields, ANCHOR linked to the public Cardano record" width="860"></p>
 
