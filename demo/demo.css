@@ -112,7 +112,15 @@ header {
 /* Redaction reads as blocks, the same mark the brand uses for "All for ▮▮▮▮".
    The blocks take the width of the text they cover, so the shape of what is
    hidden stays visible while the content does not. */
-.field-value { position: relative; }
+.field-cell { display: block; min-width: 0; }
+.field-value { position: relative; display: block; }
+.field-value .text { word-break: break-all; }
+/* Where the two lines shake hands: the anchor's public twin on Cardano. Stays
+   visible while the value itself is redacted — the record is public, the
+   holder's copy of the hash is not. */
+.field-sub { display: block; margin-top: 4px; font-size: 11px; letter-spacing: 0.02em; }
+.field-sub a { color: var(--text-secondary); text-decoration: underline dotted; text-underline-offset: 3px; }
+.field-sub a:hover { color: var(--text-primary); }
 .field-value .text { transition: opacity 0.16s ease; }
 .field-value .blocks {
   position: absolute; inset: 0; display: flex; align-items: center;
@@ -185,6 +193,11 @@ a { color: var(--text-primary); }
 .verifier.working .mark { color: var(--text-primary); animation: breathe 1.4s ease-in-out infinite; }
 
 /* --- boot sequence ------------------------------------------------------- */
+
+/* The class rule below sets display:flex, which would beat the browser's
+   [hidden] { display:none } — leaving a dead, invisible overlay over the page
+   on every visit where the boot is skipped. This rule restores hidden. */
+.boot[hidden] { display: none !important; }
 
 .boot {
   position: fixed; inset: 0; z-index: 100;

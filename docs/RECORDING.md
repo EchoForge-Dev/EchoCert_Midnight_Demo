@@ -47,7 +47,7 @@ before recording anything you care about.
 |---|---|---|
 | 1 · naming (0:00–0:04) | Load with `?boot`. The command types itself, the mark draws, two real checks report. | **The eligibility line is this shot.** Confirm the command line reads `--for "MLH Midnight Hackathon" --by "Charles Tao"` before moving on. |
 | 2 · BEFORE | Section 01, left panel. Cut to the real EchoCert page on Cardano if you want the product itself on screen. | The word BEFORE must be legible. |
-| 3 · AFTER | Section 01 right panel, then scroll to section 02 with all five fields open. | Click each redacted field once to open it first, so the shot starts with everything visible. |
+| 3 · AFTER | Section 01 right panel, then scroll to section 02 with all five fields open. | Click each redacted field once to open it first, so the shot starts with everything visible. **ANCHOR is the handshake**: open, it shows the full 64-hex hash with the gray line under it — *same hash as the public EchoCert record on Cardano mainnet · minted 2026-04-11* — hold on that for a beat. |
 | 4 · redaction | Click SUBJECT, ISSUER, ISSUED_YEAR, ANCHOR in turn. Each one blocks out and its scope flips to ○ LOCAL. | Leave DEGREE open. Sound on — redact and reveal are deliberately different tones. |
 | 5 · PROVE | Press *Prove selected field*. Do not cut. | Real proving takes 1–4.5s and the elapsed counter is real. Let it breathe; the variability is the point. |
 | 6 · FINALIZE | Same take, keep rolling to CONFIRMED. Speed this up in the edit and caption it. | Freeze on TRANSACTION and CONTRACT — those are the values a judge can look up. |

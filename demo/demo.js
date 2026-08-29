@@ -56,7 +56,7 @@ const FIELDS = [
   { key: "DEGREE", value: "BSc Computer Science", redacted: false },
   { key: "ISSUER", value: "Meridian Institute of Technology", redacted: true },
   { key: "ISSUED_YEAR", value: "2026", redacted: true },
-  { key: "ANCHOR", value: CARDANO.assetName, redacted: true, truncate: true },
+  { key: "ANCHOR", value: CARDANO.assetName, redacted: true },
 ];
 
 const FORGED_DEGREE = "PhD Astrophysics";
@@ -132,6 +132,7 @@ const I18N = {
     noteProving: (f) => `Proving ${f}. Everything else stays on this device — it is never sent, not even encrypted.`,
     anchorLine: "ANCHOR is the asset name of a real EchoCert credential on Cardano mainnet, minted 2026-04-11 — which is the SHA-256 of that credential's contents, already 32 bytes.",
     anchorLink: "Look it up →",
+    anchorSub: "same hash as the public EchoCert record on Cardano mainnet · minted 2026-04-11 ↗",
     forgeHint: "This diploma was never issued. The DEGREE field says whatever its holder wants it to say.",
     proverLive: "PROVING VIA LOCAL PROOF SERVER",
     proverReplay: "Replaying timings measured on a real run — this page has no prover.",
@@ -161,6 +162,7 @@ const I18N = {
     noteProving: (f) => `正在证明 ${f}。其余全部留在这台设备上——不发送，连加密后也不发送。`,
     anchorLine: "ANCHOR 是 Cardano 主网上一张真实 EchoCert 凭证的资产名，2026-04-11 铸造——它本身就是那张凭证内容的 SHA-256，正好 32 字节。",
     anchorLink: "去链上查 →",
+    anchorSub: "与 Cardano 主网上公开的 EchoCert 记录同一哈希 · 2026-04-11 铸造 ↗",
     forgeHint: "这张文凭从来没有被签发过。DEGREE 字段上写什么，全凭持有人自己填。",
     proverLive: "由本地 PROOF SERVER 出证",
     proverReplay: "回放一次真实运行测得的耗时——这个页面本身没有证明器。",
@@ -190,6 +192,7 @@ const I18N = {
     noteProving: (f) => `正在證明 ${f}。其餘全部留在這台裝置上——不傳送，連加密後也不傳送。`,
     anchorLine: "ANCHOR 是 Cardano 主網上一張真實 EchoCert 憑證的資產名，2026-04-11 鑄造——它本身就是那張憑證內容的 SHA-256，正好 32 位元組。",
     anchorLink: "去鏈上查 →",
+    anchorSub: "與 Cardano 主網上公開的 EchoCert 記錄同一雜湊 · 2026-04-11 鑄造 ↗",
     forgeHint: "這張文憑從來沒有被簽發過。DEGREE 欄位上寫什麼，全憑持有人自己填。",
     proverLive: "由本地 PROOF SERVER 出證",
     proverReplay: "回放一次真實運行測得的耗時——這個頁面本身沒有證明器。",
@@ -219,6 +222,7 @@ const I18N = {
     noteProving: (f) => `${f} を証明中。他はすべてこの端末に残る——送信されない、暗号化してさえ送らない。`,
     anchorLine: "ANCHOR は Cardano メインネット上の実在する EchoCert 証明書のアセット名（2026-04-11 発行）。その証明書の内容の SHA-256 そのもので、ちょうど 32 バイト。",
     anchorLink: "チェーンで確認 →",
+    anchorSub: "Cardano メインネット上の公開 EchoCert レコードと同じハッシュ · 2026-04-11 発行 ↗",
     forgeHint: "この学位は一度も発行されていない。DEGREE 欄には持ち主が書きたいことが書いてあるだけ。",
     proverLive: "ローカル PROOF SERVER で証明中",
     proverReplay: "実際の実行で測定した所要時間を再生している——このページ自体に証明器はない。",
@@ -284,14 +288,19 @@ function renderCredential() {
   for (const f of FIELDS) {
     const row = document.createElement("div");
     row.className = "field" + (f.redacted ? " redacted" : "");
-    let shown = forging && f.key === "DEGREE" ? FORGED_DEGREE : f.value;
-    if (f.truncate && shown.length > 24) shown = shown.slice(0, 12) + "…" + shown.slice(-8);
+    // Full value, always — the anchor is a 64-hex asset name a judge may want
+    // to compare character by character with the Cardano record.
+    const shown = forging && f.key === "DEGREE" ? FORGED_DEGREE : f.value;
     // One block per character: the redaction covers the value without
     // pretending the value was never there.
     const blocks = "▮".repeat(Math.min(shown.length, 46));
     row.innerHTML = `
       <span class="label-tech">${f.key}</span>
-      <span class="field-value value-tech"><span class="text">${shown}</span><span class="blocks">${blocks}</span></span>
+      <span class="field-cell"><span class="field-value value-tech"><span class="text">${shown}</span><span class="blocks">${blocks}</span></span>${
+        f.key === "ANCHOR"
+          ? `<span class="field-sub"><a href="${CARDANO_URL}" target="_blank" rel="noopener">${t("anchorSub")}</a></span>`
+          : ""
+      }</span>
       <span class="scope ${f.redacted ? "local" : "public"}">${f.redacted ? "○ LOCAL" : "● DISCLOSED"}</span>`;
     row.addEventListener("click", () => {
       if (busy) return;
