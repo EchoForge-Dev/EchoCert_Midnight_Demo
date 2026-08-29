@@ -22,10 +22,10 @@ The rule of thumb I held myself to: **prior work may be the "before" and the ass
 | Brand & design system | `EchoForge.svg`, `EFB.svg`, the EchoForgeStyle spec and a Midnight landing draft. The marks are in this repo; the spec and the draft are internal design documents and are kept out of it. | 2026-08-05 → 08-26 | `brand/`, `design/assets/` |
 | Sound library — uisfx | Third-party (MIT code / CC0 audio). Unmodified npm dependency, not vendored. | added 2026-08-21 | `package.json` |
 | Sound library — Kenney UI pack | Third-party CC0 audio, vendored unchanged. | added 2026-08-03 | `kenney/` |
-| Midnight knowledge base | `MIDNIGHT_KB.html` and the EchoMKB agent skill (separate public repo, installed here) | 2026-08-04 → 08-26 | `docs/MIDNIGHT_KB.html`, `.agents/skills/echomkb`, `skills-lock.json` |
+| Midnight knowledge base | `MIDNIGHT_KB.html` and the EchoMKB agent skill. The skill is installed here; the KB itself is not in this repo. | 2026-08-04 → 08-26 | m.echoforgeef.com/kb · [EchoForge-Dev/EchoMKB](https://github.com/EchoForge-Dev/EchoMKB) · `.agents/skills/echomkb` |
 | Compact reference examples | 4 study contracts written while learning Compact (counter / age-credential / document-anchor / private-ballot). Declared for completeness; not included in this repo and not used by it. | 2026-08-05 | private workspace |
-| Principle diagram | `echocert-principle.svg` | 2026-08-21 | `docs/` |
-| Video storyboard | `VIDEO-SCRIPT.md` | 2026-08-22 → 08-26 | `docs/` |
+| Principle diagram | `echocert-principle.svg`. Declared for completeness; not included in this repo. | 2026-08-21 | private workspace |
+| Video storyboard | `VIDEO-SCRIPT.md`. Declared for completeness; production notes are kept out of this repo. | 2026-08-22 → 08-26 | private workspace |
 
 ## What is deliberately NOT here: the rehearsal
 
