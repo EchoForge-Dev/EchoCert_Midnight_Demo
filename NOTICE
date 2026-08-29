@@ -1,0 +1,19 @@
+EchoCert on Midnight
+Copyright 2026 Charles Tao (EchoForge)
+
+The source code in this repository is licensed under the Apache License,
+Version 2.0 — see LICENSE.
+
+Brand assets are not covered by that licence. The EchoForge and EchoCert
+names, the EchoForge marks and lockups (brand/, design/assets/,
+demo/assets/echo-mark-ascii.txt, demo/assets/EchoForge.svg) and the visual
+identity they form are © 2026 Charles Tao (EchoForge), all rights reserved.
+They may not be used, modified or redistributed without written permission,
+and nothing in this repository grants any right to use them to identify other
+products or to imply endorsement. (Apache-2.0 §6 grants no trademark rights
+in any case.)
+
+Third-party assets, under their own licences:
+- Kenney UI Audio pack (kenney/, demo/assets/*.ogg) — CC0 1.0
+- uisfx (npm dependency) — MIT (code), CC0 (audio)
+- IBM Plex Mono, Noto Sans SC/TC/JP — SIL Open Font License 1.1 (via Google Fonts)

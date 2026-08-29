@@ -207,7 +207,9 @@ runtime must match.
 
 ## Licence
 
-Apache-2.0. Third-party audio: uisfx (MIT / CC0), Kenney UI pack (CC0).
+Apache-2.0 for the code. The EchoForge and EchoCert names, marks and visual
+identity are **all rights reserved** and not licensed — see [NOTICE](NOTICE).
+Third-party audio: uisfx (MIT / CC0), Kenney UI pack (CC0).
 
 ## About the author
 
