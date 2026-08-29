@@ -1,20 +1,80 @@
-# EchoCert on Midnight
+<p align="center">
+  <img src="media/card-before.png" alt="Midnight University. Two applicants." width="860">
+</p>
 
-**Prove one field of a diploma. Reveal nothing else. Leave nothing behind that
-links two proofs to the same person.**
+<h1 align="center">EchoCert on Midnight</h1>
+
+<p align="center"><strong>Prove one field of a diploma. Reveal nothing else.<br>Leave nothing behind that links two proofs to the same person.</strong></p>
+
+<p align="center">
+  <img alt="track" src="https://img.shields.io/badge/track-Integrate%20Midnight-000000?style=flat-square">
+  <img alt="network" src="https://img.shields.io/badge/network-preprod-4EDE80?style=flat-square&labelColor=000000">
+  <img alt="compact" src="https://img.shields.io/badge/Compact-0.31.1-000000?style=flat-square">
+  <img alt="licence" src="https://img.shields.io/badge/licence-Apache--2.0-000000?style=flat-square">
+  <img alt="built with" src="https://img.shields.io/badge/built%20with-Claude%20Code-000000?style=flat-square">
+</p>
+
+<p align="center">
+  <a href="https://m.echoforgeef.com/echocert/">Live demo</a> ·
+  <a href="⟨YouTube link⟩">Video (2:45)</a> ·
+  <a href="PRIOR-WORK.md">Prior-work declaration</a> ·
+  <a href="#the-story-the-demo-tells">The story</a> ·
+  <a href="#try-it">Try it</a>
+</p>
 
 Built for the MLH Midnight Hackathon, 2026-08-28 → 08-30, by Charles Tao (solo),
-in the **Integrate Midnight to Upgrade an Existing App** track.
-
-Built by pair-programming with Claude Code. What existed before the event, and
-why this moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
+in the **Integrate Midnight to Upgrade an Existing App** track. Built by
+pair-programming with Claude Code. What existed before the event, and why this
+moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
 
 **Live demo:** https://m.echoforgeef.com/echocert/ — proofs replayed from a real
 run on public preprod, chain panel live. Run the repo locally and the same page
-proves for real.
+proves for real. **Video:** ⟨YouTube link⟩ — the captions are the narration; the
+proving sequence is real time, landing on chain is the one sped-up shot and says so.
 
-**Video:** ⟨YouTube link⟩ — the captions are the narration. The proving sequence
-is real time; landing on chain is the one sped-up shot, and it says so.
+---
+
+## The story the demo tells
+
+Midnight University. Two applicants.
+
+**Chuck** has a real diploma. It is already on EchoCert — my public credential
+registry on Cardano — as a record anyone can verify. That is the BEFORE:
+verifiable, and entirely public. Admissions needs one field; the registry shows
+all five.
+
+<p align="center"><img src="media/demo-credential.png" alt="The credential: five fields, ANCHOR linked to the public Cardano record" width="860"></p>
+
+On Midnight the same credential stays on Chuck's device. The chain holds a
+commitment to it, hashed once more before it is stored. The ANCHOR row is where
+the two lines meet: its value is the SHA-256 that names the real Cardano record,
+minted 2026-04-11, linked from the page so anyone can compare.
+
+Chuck redacts four fields and proves one. His device generates a zero-knowledge
+proof that a credential with this degree is in the registry — a Merkle path
+against a root the contract knows — without revealing which entry. The only
+thing that leaves the device is a hash of the degree: 32 bytes.
+
+<p align="center"><img src="media/demo-prove.png" alt="The field condenses into the one value that leaves the device: sha256(DEGREE), 32 bytes" width="860"></p>
+
+The transaction lands on public preprod. The university verifies it from the
+transaction alone — a wallet-less query to the public indexer — and learns the
+degree, and nothing else. Chuck is admitted.
+
+<p align="center"><img src="media/demo-verify.png" alt="On chain: transaction, contract, real size in bytes; the verdict beside the raw indexer response" width="860"></p>
+
+**Charles** has no diploma, so he forges one. The Merkle path does not match his
+credential, and the circuit refuses to produce a proof. It fails on his own
+device in about twenty milliseconds. Nothing is sent.
+
+Chuck also applied to two other universities. Three proofs, three transactions,
+and nothing in them that two *different* holders' proofs would not also share —
+measured, not assumed.
+
+<p align="center"><img src="media/card-unlinkable.png" alt="Three universities. None of them can tell." width="860"></p>
+
+Chuck is my nickname. Both applicants are me: I built the public registry, and
+then the private proof. The rest of that story is at the end of this file.
 
 ---
 
@@ -153,6 +213,9 @@ VM, not the sync. The containers moved to OrbStack and the sync finished.
 
 ### Unlinkability, as an experiment rather than a claim
 
+<details>
+<summary>The experiment, step by step</summary>
+
 "Two proofs by the same holder cannot be linked" is easy to assert. So
 `contract/e2e/unlinkability.ts` tries to break it against a real chain, and
 reports what it finds:
@@ -176,6 +239,8 @@ identifier and the design would be broken. There is none.
 ```
 NOTHING LINKS THE PROOFS
 ```
+
+</details>
 
 ---
 
@@ -213,6 +278,7 @@ it lands in 18.7 s.
 | `contract/e2e/preprod.ts` | The same against public preprod |
 | `contract/e2e/prover-service.ts` | The demo's LIVE prover |
 | `demo/` | The demo page |
+| `media/` | Screenshots and title cards used above |
 | `PRIOR-WORK.md` | **What existed before the event, as the track requires — and how this moved as fast as it did** |
 
 ## Versions
