@@ -13,6 +13,9 @@ why this moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
 run on public preprod, chain panel live. Run the repo locally and the same page
 proves for real.
 
+**Video:** ⟨YouTube link⟩ — the captions are the narration. The proving sequence
+is real time; landing on chain is the one sped-up shot, and it says so.
+
 ---
 
 ## The two lines
@@ -95,6 +98,19 @@ Open `http://localhost:8080`. With the prover running the page says **LIVE** and
 every proof is real. Without it the page says **REPLAY**, replays timings
 measured from a real run, and says so — it never pretends to prove.
 
+What you will see, in three moments:
+
+- **PROVE.** The redacted fields dissolve into a field of glyphs and stay there
+  until the prover reports that the proof exists — 1–4.5 s, different every
+  time — then the field condenses into the only value that leaves the device:
+  the SHA-256 of the chosen field, 32 bytes, computed on the page before
+  anything is sent.
+- **FINALIZE.** The transaction lands (~20 s) and the page fetches it back from
+  the public indexer: hash, block, contract, and its real size in bytes. The
+  disclosed value on chain is checked against the one computed locally.
+- **VERIFY.** The verdict beside the raw indexer response — a wallet-less query
+  with its real round trip, and the exact query you can paste to repeat it.
+
 ---
 
 ## Measured, not estimated
@@ -111,7 +127,7 @@ Local devnet, proof server 8.1.0, real PLONK proofs:
 | Wallet-less indexer read | 7 ms |
 
 Proving time genuinely varies by more than 2×, so the demo animates until the
-promise resolves and never hard-codes a duration.
+prover reports that the proof exists, and never hard-codes a duration.
 
 ### And on public preprod
 
@@ -122,6 +138,7 @@ The same pipeline, against the public preprod network, 2026-08-28:
 | `deployContract` | 22.5 s |
 | `issue()` full pipeline | 22.7 s |
 | `proveDegree()` full pipeline | 18.7 s |
+| Proof transaction on chain | 8,205 bytes — the whole transaction, proof included |
 | Wallet-less indexer read | 372 ms |
 
 Contract `4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b` ·
