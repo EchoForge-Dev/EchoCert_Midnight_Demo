@@ -30,7 +30,10 @@ cd contract && MIDNIGHT_NETWORK=preprod MIDNIGHT_WALLET_SEED=… npm run prover
 #    rm -f e2e/.deployment-undeployed.json && npm run prover
 
 # 3. serve the page (demo/ is self-contained — any static server, any path)
-python3 -m http.server 8080
+python3 -c 'import http.server as h
+class H(h.SimpleHTTPRequestHandler):
+  def end_headers(s): s.send_header("Cache-Control","no-store"); super().end_headers()
+h.ThreadingHTTPServer(("",8080),H).serve_forever()'   # caching OFF — a cached index.html once hid a new element for ten minutes; Cmd+Shift+R also works
 ```
 
 Open `http://localhost:8080/demo/index.html?boot`. The badge must read
@@ -49,9 +52,9 @@ before recording anything you care about.
 | 2 · BEFORE | Section 01, left panel. Cut to the real EchoCert page on Cardano if you want the product itself on screen. | The word BEFORE must be legible. |
 | 3 · AFTER | Section 01 right panel, then scroll to section 02 with all five fields open. | Click each redacted field once to open it first, so the shot starts with everything visible. **ANCHOR is the handshake**: open, it shows the full 64-hex hash with the gray line under it — *same hash as the public EchoCert record on Cardano mainnet · minted 2026-04-11* — hold on that for a beat. |
 | 4 · redaction | Click SUBJECT, ISSUER, ISSUED_YEAR, ANCHOR in turn. Each one blocks out and its scope flips to ○ LOCAL. | Leave DEGREE open. Sound on — redact and reveal are deliberately different tones. |
-| 5 · PROVE | Press *Prove selected field*. Do not cut. | Real proving takes 1–4.5s and the elapsed counter is real. Let it breathe; the variability is the point. |
-| 6 · FINALIZE | Same take, keep rolling to CONFIRMED. Speed this up in the edit and caption it. | Freeze on TRANSACTION and CONTRACT — those are the values a judge can look up. |
-| 7 · VERIFY | Same take: ✓ VALID, then scroll to section 05. | The chain panel's round trip is genuinely single-digit milliseconds. |
+| 5 · PROVE | Press *Prove selected field*. Do not cut. | The redacted fields break into glyphs and rise into the field of noise; the field runs until the prover reports the proof exists (1–4.5 s, real, the counter is real), then condenses into the one value that leaves the device — `sha256(DEGREE)`, 32 bytes. Let it breathe. |
+| 6 · FINALIZE | Same take, keep rolling: SUBMITTED → CONFIRMED (~15–18 s). Speed this up in the edit and caption it *(sped up)*. | Freeze on the ON CHAIN block: TRANSACTION, CONTRACT, LANDED IN, and SIZE counting up to the transaction's real byte count fetched from the public indexer. The *Run it yourself* query is the thing a judge can paste. |
+| 7 · VERIFY | Same take: ✓ VALID on the left, RAW INDEXER RESPONSE on the right — a live wallet-less query, real milliseconds, block height and tx hash in white. | Unaccelerated on-chain evidence, on the same screen as the verdict. Then scroll to section 05 if you want the contract-level panel too. |
 | 8 · the forgery | Press *Try it with a forged diploma*, then *Prove selected field*. | It fails in ~20ms. Caption that the request never left the machine. |
 | 9 · unlinkability | Section 04, press *Prove to all three*. Three real proofs, ~20s each. | Speed up in the edit. Land on the summary rows — especially "two different holders share exactly as much". |
 | 9b · closing card | Claude Design. | No age anywhere in the video. |

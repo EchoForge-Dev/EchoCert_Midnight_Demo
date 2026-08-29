@@ -74,16 +74,19 @@ const SFX = {
   press: "assets/click1.ogg",
   ok: "assets/switch7.ogg",
   fail: "assets/switch32.ogg",
+  tick: "assets/rollover2.ogg",
+  public: "assets/switch10.ogg",
 };
 const audio = {};
 let muted = false;
 try { muted = localStorage.getItem("echocert-muted") === "1"; } catch { /* private window */ }
 
-function play(name) {
+function play(name, vol = 0.28) {
   if (muted) return;
   try {
     let a = audio[name];
-    if (!a) { a = audio[name] = new Audio(SFX[name]); a.volume = 0.28; }
+    if (!a) { a = audio[name] = new Audio(SFX[name]); }
+    a.volume = vol;
     a.currentTime = 0;
     a.play().catch(() => { /* autoplay policy — the page works silently */ });
   } catch { /* audio is a nicety, never a dependency */ }
@@ -347,6 +350,194 @@ function startClock() {
   };
 }
 
+// --- the proving stage -----------------------------------------------------
+//
+// What the viewer sees while a proof is generated: the redacted fields break
+// into glyphs and drift into a field of noise, which then condenses into the
+// one value that actually leaves the device. The timing is real — the field
+// runs until the prover says the proof exists.
+
+const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const stage = { raf: 0, t: 0, density: 0, condense: 0, target: 0, running: false, start: 0 };
+
+function paintField() {
+  const cv = $("field-canvas");
+  const ctx = cv.getContext("2d");
+  const r = cv.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = Math.max(200, Math.round(r.width)), H = Math.max(120, Math.round(r.height));
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const ink = getComputedStyle(document.body).getPropertyValue("--text-primary").trim() || "#fff";
+  ctx.fillStyle = ink;
+  const cw = 11, ch = 16;
+  ctx.font = `${cw}px "IBM Plex Mono", monospace`;
+  ctx.textBaseline = "top";
+  const ramp = ["·", "░", "▒", "▓"];
+  const t = stage.t, d = stage.density, c = stage.condense;
+  const band = H * 0.62, bandW = H * 0.34;
+  for (let gy = 0; gy * ch < H; gy++) {
+    const py = gy * ch;
+    // as the field condenses, everything away from one horizontal band fades
+    const mask = 1 - c * Math.min(1, Math.abs(py + ch / 2 - band) / bandW);
+    if (mask <= 0.02) continue;
+    for (let gx = 0; gx * cw < W; gx++) {
+      const px = gx * cw;
+      const nx = px * 0.013, ny = py * 0.014;
+      const n = Math.sin(nx + t * 0.30) * Math.cos(ny * 1.3 - t * 0.21) + Math.sin((nx + ny) * 0.7 + t * 0.15) * 0.6;
+      const grain = ((gx * 7 + gy * 13) % 5) / 5;
+      const v = ((n * 0.5 + 0.5) * d * mask) - grain * 0.28;
+      if (v <= 0.12) continue;
+      ctx.globalAlpha = v > 0.6 ? 0.95 : 0.55;
+      ctx.fillText(v > 0.75 ? ramp[3] : v > 0.5 ? ramp[2] : v > 0.3 ? ramp[1] : ramp[0], px, py);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function stageLoop(ts) {
+  if (!stage.running) return;
+  stage.raf = requestAnimationFrame(stageLoop);
+  if (!stage.start) stage.start = ts;
+  stage.t = (ts - stage.start) / 1000;
+  // density eases toward its target; condense eases toward its target
+  stage.density += (stage.target - stage.density) * 0.08;
+  paintField();
+}
+
+function startStage() {
+  const el = $("stage");
+  el.hidden = false;
+  $("stage-out").classList.remove("on");
+  $("stage-out").innerHTML = "";
+  Object.assign(stage, { t: 0, density: 0, condense: 0, target: 1, running: true, start: 0 });
+  if (reducedMotion) { stage.density = 0.7; paintField(); return; }
+  stage.raf = requestAnimationFrame(stageLoop);
+}
+
+/// The field collapses into the one value that leaves the device.
+async function condenseStage(pub) {
+  if (!reducedMotion) {
+    const t0 = performance.now();
+    await new Promise((resolve) => {
+      const step = () => {
+        const k = Math.min(1, (performance.now() - t0) / 700);
+        stage.condense = k; stage.target = 1 - k * 0.85;
+        if (k < 1) requestAnimationFrame(step); else resolve();
+      };
+      step();
+    });
+  }
+  const out = $("stage-out");
+  out.innerHTML = `<div class="hash-label">${pub.label} · what leaves the device · ${pub.bytes}</div><div class="hash-out"></div>`;
+  out.classList.add("on");
+  // the value unmasks from noise into hex, left to right
+  const target = pub.value;
+  const hashEl = out.querySelector(".hash-out");
+  const glyphs = "░▒▓";
+  for (let i = 0; i <= target.length; i += 3) {
+    hashEl.textContent = target.slice(0, i) + [...target.slice(i)].map(() => glyphs[Math.floor(Math.random() * 3)]).join("");
+    await sleep(reducedMotion ? 0 : 14);
+  }
+  hashEl.textContent = target;
+}
+
+function stopStage() {
+  stage.running = false;
+  cancelAnimationFrame(stage.raf);
+}
+
+/// Break every redacted row's blocks into glyphs that rise out of the row.
+function dissolveRedacted() {
+  if (reducedMotion) return () => {};
+  const timers = [];
+  document.querySelectorAll(".field.redacted .blocks").forEach((blocks) => {
+    const n = blocks.textContent.length;
+    blocks.innerHTML = Array.from({ length: n }, (_, i) => `<span class="g" style="animation-delay:${i * 14}ms">▮</span>`).join("");
+    blocks.classList.add("dissolving");
+    const g = "░▒▓";
+    timers.push(setInterval(() => {
+      blocks.querySelectorAll(".g").forEach((el) => { el.textContent = g[Math.floor(Math.random() * 3)]; });
+    }, 70));
+  });
+  return () => timers.forEach(clearInterval);
+}
+
+/// Exactly what the circuit publishes for a field — computed on this device,
+/// before anything is sent, so the on-chain value can be checked against it.
+async function publicInputOf(f) {
+  const plain = forging && f.key === "DEGREE" ? FORGED_DEGREE : f.value;
+  if (f.key === "ISSUED_YEAR") return { label: "Uint<16>", value: String(Number(plain)), bytes: "2 bytes" };
+  if (f.key === "ANCHOR") return { label: "Bytes<32> · the Cardano asset name", value: plain, bytes: "32 bytes" };
+  if (!crypto.subtle) return { label: `sha256(${f.key})`, value: "(WebCrypto unavailable)", bytes: "32 bytes" };
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(plain));
+  return { label: `sha256(${f.key})`, value: [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join(""), bytes: "32 bytes" };
+}
+
+/// Stream the prover's phases: proving → proved → landed.
+async function streamProve(fieldKey, on) {
+  const res = await fetch(`${PROVER_URL}/prove`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "text/event-stream" },
+    body: JSON.stringify({ field: fieldKey }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  if (!(res.headers.get("content-type") || "").includes("text/event-stream")) {
+    // A prover that does not stream phases: treat its single answer as landing.
+    const r = await res.json();
+    if (r.error) throw new Error(r.error);
+    on.landed(r);
+    return;
+  }
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let idx;
+    while ((idx = buf.indexOf("\n\n")) >= 0) {
+      const chunk = buf.slice(0, idx); buf = buf.slice(idx + 2);
+      const line = chunk.split("\n").find((l) => l.startsWith("data: "));
+      if (!line) continue;
+      const ev = JSON.parse(line.slice(6));
+      if (ev.phase === "proved") on.proved(ev.proveMs);
+      else if (ev.phase === "landed") on.landed(ev);
+      else if (ev.phase === "failed") throw new Error(ev.error);
+    }
+  }
+}
+
+const TX_QUERY = `query($id: HexEncoded!) { transactions(offset: { identifier: $id }) { hash raw block { height } contractActions { address } } }`;
+
+/// The transaction as the public indexer returns it — no wallet, no SDK.
+async function fetchRawTx(indexerUrl, txId) {
+  const t0 = performance.now();
+  const res = await fetch(indexerUrl, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ query: TX_QUERY, variables: { id: txId } }),
+  });
+  const json = await res.json();
+  const ms = Math.round(performance.now() - t0);
+  const tx = json?.data?.transactions?.[0];
+  if (!tx) throw new Error(json?.errors?.[0]?.message ?? "transaction not found (yet)");
+  return { tx, ms, bytes: Math.round((tx.raw?.length ?? 0) / 2) };
+}
+
+function countUp(el, target, ms = 600) {
+  const t0 = performance.now();
+  const step = () => {
+    const k = Math.min(1, (performance.now() - t0) / ms);
+    el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))).toLocaleString();
+    if (k < 1) requestAnimationFrame(step);
+  };
+  step();
+}
+
+const escapeHtml = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
 async function prove() {
   if (busy) return;
   busy = true;
@@ -375,48 +566,101 @@ async function prove() {
     return;
   }
 
+  // --- PROVING: the field runs until the proof exists ---------------------
   setState("PROVING", "proving");
   $("prover-hint").textContent = mode === "LIVE" ? t("proverLive") : t("proverReplay");
   const stopProve = startClock();
+  const tick = setInterval(() => play("tick", 0.10), 900);
+  startStage();
+  const stopDissolve = dissolveRedacted();
+  const pub = await publicInputOf(field);
 
-  let result;
-  if (mode === "LIVE") {
-    const res = await fetch(`${PROVER_URL}/prove`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ field: field.key }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    result = await res.json();
-  } else {
-    await sleep(RECORDED.provingMs);
-    result = { ...RECORDED, replay: true };
+  let proveMs = 0, stopFinal = null, landed = null;
+  const onProved = async () => {
+    proveMs = stopProve();
+    clearInterval(tick);
+    stopDissolve();
+    play("ok");
+    await condenseStage(pub);
+    setState("SUBMITTED", null, (proveMs / 1000).toFixed(1) + "s");
+    outRow("PUBLIC INPUT", `${pub.label} = ${pub.value}`);
+    outRow("PROOF TIME", `${(proveMs / 1000).toFixed(1)}s — generated on this device`);
+    $("prover-hint").textContent = "Landing on Midnight — proving is done; this is the network's time now.";
+    renderCredential(); // the redacted rows come back: they never left
+    stopFinal = startClock();
+  };
+
+  try {
+    if (mode === "LIVE") {
+      await streamProve(field.key, { proved: () => { void onProved(); }, landed: (r) => { landed = r; } });
+      if (!stopFinal) await onProved(); // a prover without the proved event: treat landing as both
+    } else {
+      await sleep(RECORDED.provingMs);
+      await onProved();
+      await sleep(RECORDED.finalizeMs);
+      landed = { ...RECORDED, replay: true };
+    }
+    if (!landed) throw new Error("the prover ended without a result");
+  } catch (e) {
+    clearInterval(tick); stopDissolve(); stopStage(); $("stage").hidden = true;
+    busy = false; $("btn-forge").disabled = false; renderCredential();
+    throw e;
   }
-  const proveMs = stopProve();
 
-  setState("SUBMITTED", null, (proveMs / 1000).toFixed(1) + "s");
-  outRow("DISCLOSED FIELD", field.key);
-  outRow("DISCLOSED VALUE", result.disclosed ?? RECORDED.disclosed);
-  // In LIVE mode one call covers prove, balance, submit and finalize, so this
-  // is the whole pipeline — not the proving step alone.
-  outRow(mode === "LIVE" ? "PROVE → ON CHAIN" : "PROOF TIME", (proveMs / 1000).toFixed(1) + "s");
-
-  // Landing on chain is the slow part; the design system says show it honestly.
-  setState("SUBMITTED", null);
-  const stopFinal = startClock();
-  if (mode === "REPLAY") await sleep(RECORDED.finalizeMs);
-  const finalMs = stopFinal();
-
+  // --- FINALIZE: on chain -------------------------------------------------
+  const finalMs = stopFinal ? stopFinal() : 0;
+  stopStage();
   setState("CONFIRMED", "confirmed", ((proveMs + finalMs) / 1000).toFixed(1) + "s");
-  play("ok");
-  outRow("TRANSACTION", result.proveTxId ?? RECORDED.proveTxId);
-  outRow("CONTRACT", result.contractAddress ?? RECORDED.contractAddress);
-  const verdict = document.createElement("p");
-  verdict.className = "verdict ok";
-  verdict.textContent = t("verdictOk");
-  $("proof-out").appendChild(verdict);
-  outRow("VERIFIER LEARNED", `${field.key} only`);
-  outRow("VERIFIER DID NOT LEARN", FIELDS.filter((f) => f.redacted).map((f) => f.key).join(", "));
+  play("public", 0.34);
+  $("prover-hint").textContent = "";
+  const txId = landed.proveTxId ?? RECORDED.proveTxId;
+  const contract = landed.contractAddress ?? RECORDED.contractAddress;
+  const indexerUrl = mode === "LIVE" ? indexer : INDEXERS.preprod;
+
+  const onChain = document.createElement("div");
+  onChain.className = "evidence";
+  onChain.innerHTML = `<span class="label-tech">ON CHAIN · ${mode === "LIVE" ? (liveNetwork === "undeployed" ? "local devnet" : liveNetwork) : "preprod (recorded run)"}</span>`;
+  $("proof-out").appendChild(onChain);
+  const row = (l, v) => { const r = document.createElement("div"); r.className = "out-row"; r.innerHTML = `<span class="label-tech">${l}</span><span class="mono-code">${v}</span>`; onChain.appendChild(r); return r; };
+  row("TRANSACTION", txId);
+  row("CONTRACT", contract);
+  row("LANDED IN", `${(finalMs / 1000).toFixed(1)}s after the proof`);
+  const sizeRow = row("SIZE", `<span class="count">0</span> bytes — fetching the transaction from the public indexer…`);
+  if (mode === "LIVE" && landed.disclosed !== undefined) {
+    const same = landed.disclosed === pub.value;
+    row("DISCLOSED VALUE", same ? "✓ identical to the public input computed on this device before sending" : `on chain: ${landed.disclosed}`);
+  }
+
+  // --- VERIFY: the verdict, and the raw evidence beside it ----------------
+  const two = document.createElement("div");
+  two.className = "out-two";
+  two.innerHTML = `
+    <div>
+      <p class="verdict ok">${t("verdictOk")}</p>
+      <div class="out-row"><span class="label-tech">VERIFIER LEARNED</span><span class="mono-code">${field.key} only</span></div>
+      <div class="out-row"><span class="label-tech">VERIFIER DID NOT LEARN</span><span class="mono-code">${FIELDS.filter((f) => f.redacted).map((f) => f.key).join(", ")}</span></div>
+      <div class="out-row"><span class="label-tech">RUN IT YOURSELF</span><pre class="raw">POST ${escapeHtml(indexerUrl)}
+${escapeHtml(TX_QUERY)}
+variables: { "id": "${txId}" }</pre></div>
+    </div>
+    <div class="evidence" id="raw-evidence">
+      <span class="label-tech">RAW INDEXER RESPONSE · no wallet · fetching…</span>
+      <pre class="raw"></pre>
+    </div>`;
+  $("proof-out").appendChild(two);
+
+  try {
+    const { tx, ms, bytes } = await fetchRawTx(indexerUrl, txId);
+    sizeRow.querySelector(".mono-code").innerHTML = `<span class="count">0</span> bytes on chain — the whole transaction, proof included`;
+    countUp(sizeRow.querySelector(".count"), bytes);
+    const shown = { hash: tx.hash, block: tx.block ?? undefined, contractActions: tx.contractActions, raw: `${tx.raw.slice(0, 80)}… (${bytes} bytes)` };
+    const ev = $("raw-evidence");
+    ev.querySelector(".label-tech").textContent = `RAW INDEXER RESPONSE · no wallet · ${ms} ms · live`;
+    ev.querySelector("pre").innerHTML = escapeHtml(JSON.stringify(shown, null, 2)).replace(/"(hash|height|address)": "?([^",\n]+)"?/g, (m, k, v) => `"${k}": <b>${v}</b>`);
+  } catch (e) {
+    sizeRow.querySelector(".mono-code").textContent = `not readable yet — ${e.message}`;
+    $("raw-evidence").querySelector("pre").textContent = e.message;
+  }
 
   busy = false;
   $("btn-forge").disabled = false;

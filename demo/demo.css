@@ -256,3 +256,28 @@ html[lang="ja"] body, html[lang="ja"] .btn, html[lang="ja"] button { font-family
 .foot-links a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px solid var(--border-color); }
 .foot-links a:hover { color: var(--text-primary); }
 .foot-note { font-size: 11px; color: var(--text-secondary); }
+
+/* --- the proving stage ---------------------------------------------------- */
+
+.stage { position: relative; height: 210px; margin: 4px 0 16px; border: 1px solid var(--border-color); overflow: hidden; background: var(--bg-primary); }
+.stage[hidden] { display: none; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage-out { position: absolute; left: 18px; right: 18px; bottom: 16px; opacity: 0; transition: opacity 0.35s ease; }
+.stage-out.on { opacity: 1; }
+.hash-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
+.hash-out { font-size: 15px; letter-spacing: 0.02em; word-break: break-all; line-height: 1.5; }
+
+/* redacted blocks breaking up and rising into the field */
+.blocks .g { display: inline-block; }
+.blocks.dissolving .g { animation: dissolve 0.7s ease-in forwards; }
+@keyframes dissolve { to { transform: translateY(-18px); opacity: 0; } }
+
+/* on-chain block + raw evidence */
+.out-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; margin-top: 8px; }
+@media (max-width: 760px) { .out-two { grid-template-columns: 1fr; } }
+.evidence { border: 1px solid var(--border-color); padding: 12px 14px; }
+.evidence .label-tech { display: block; margin-bottom: 8px; }
+pre.raw { margin: 0; font-family: inherit; font-size: 11px; line-height: 1.55; color: var(--text-secondary); white-space: pre-wrap; word-break: break-all; max-height: 240px; overflow: auto; }
+pre.raw b { color: var(--text-primary); font-weight: 400; }
+.count { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .blocks.dissolving .g { animation: none; } .scan.on i { animation: none; } }

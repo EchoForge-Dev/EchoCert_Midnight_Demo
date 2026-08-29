@@ -87,7 +87,20 @@ const FIELD_TO_CIRCUIT: Record<string, CircuitName> = {
 
 async function main() {
   const zkConfigProvider = new NodeZkConfigProvider<CircuitName | "issue">("build");
-  const proofProvider = httpClientProofProvider(ENV.proofServer, zkConfigProvider, { timeout: 600_000 });
+  const rawProofProvider = httpClientProofProvider(ENV.proofServer, zkConfigProvider, { timeout: 600_000 });
+  // callTx is opaque until the transaction has landed, but the demo wants to
+  // show the moment proving finished — that is the shot whose timing varies.
+  // Wrapping proveTx exposes that instant without touching the pipeline.
+  let provedHook: ((ms: number) => void) | null = null;
+  const proofProvider = {
+    proveTx: async (...args: any[]) => {
+      const t0 = performance.now();
+      const out = await (rawProofProvider as any).proveTx(...args);
+      provedHook?.(Math.round(performance.now() - t0));
+      return out;
+    },
+  };
+  let inFlight = false;
   const publicDataProvider = indexerPublicDataProvider(ENV.indexer, ENV.indexerWS);
   const privateStateProvider = inMemoryPrivateStateProvider<string, EchoCertPrivateState>();
 
@@ -195,27 +208,47 @@ async function main() {
       const wanted = (JSON.parse(body || "{}").field ?? "DEGREE") as string;
       const circuit = FIELD_TO_CIRCUIT[wanted];
       if (!circuit) return res.writeHead(400, cors).end(JSON.stringify({ error: `unknown field ${wanted}` }));
+      if (inFlight) return res.writeHead(409, cors).end(JSON.stringify({ error: "a proof is already in flight" }));
 
+      // With `Accept: text/event-stream` the phases stream as they happen:
+      // proving → proved (with the real proving time) → landed. Plain clients
+      // still get one JSON document at the end.
+      const sse = (req.headers.accept ?? "").includes("text/event-stream");
+      const send = (obj: unknown) => { if (sse) res.write(`data: ${JSON.stringify(obj)}\n\n`); };
+      if (sse) res.writeHead(200, { ...cors, "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
+
+      inFlight = true;
       console.log(`[prover] ${circuit}…`);
       const t0 = performance.now();
+      let proveMs: number | null = null;
+      provedHook = (ms) => { proveMs = ms; console.log(`[prover] ${circuit} proved in ${ms}ms`); send({ phase: "proved", proveMs: ms }); };
+      send({ phase: "proving" });
       try {
         const tx = await (holder as any).callTx[circuit]();
         const ms = Math.round(performance.now() - t0);
         const raw = tx.private.result;
         console.log(`[prover] ${circuit} landed in ${ms}ms — ${tx.public.txId}`);
-        return res.writeHead(200, cors).end(JSON.stringify({
+        const result = {
+          phase: "landed",
           field: wanted,
           disclosed: typeof raw === "bigint" ? raw.toString() : hex(raw),
           proveTxId: tx.public.txId,
           contractAddress: deployment.contractAddress,
           blockHeight: tx.public.blockHeight ?? null,
+          proveMs,
           totalMs: ms,
           network: NETWORK,
-        }));
+        };
+        if (sse) { send(result); return res.end(); }
+        return res.writeHead(200, cors).end(JSON.stringify(result));
       } catch (e) {
         const msg = e instanceof Error ? e.message.split("\n")[0] : String(e);
         console.error(`[prover] ${circuit} failed: ${msg}`);
+        if (sse) { send({ phase: "failed", error: msg }); return res.end(); }
         return res.writeHead(500, cors).end(JSON.stringify({ error: msg }));
+      } finally {
+        provedHook = null;
+        inFlight = false;
       }
     }
 

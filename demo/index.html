@@ -97,6 +97,14 @@
       </div>
       <div class="scan" id="scan"><i></i></div>
 
+      <!-- The proving stage: the redacted fields dissolve into this field of
+           glyphs while the proof is generated, and it condenses into the one
+           value that actually leaves the device. -->
+      <div class="stage" id="stage" hidden>
+        <canvas id="field-canvas"></canvas>
+        <div class="stage-out" id="stage-out"></div>
+      </div>
+
       <div class="out" id="proof-out"></div>
 
       <div class="btn-row">
