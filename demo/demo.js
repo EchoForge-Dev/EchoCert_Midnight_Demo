@@ -584,8 +584,10 @@ async function prove() {
     await condenseStage(pub);
     setState("SUBMITTED", null, (proveMs / 1000).toFixed(1) + "s");
     outRow("PUBLIC INPUT", `${pub.label} = ${pub.value}`);
-    outRow("PROOF TIME", `${(proveMs / 1000).toFixed(1)}s — generated on this device`);
-    $("prover-hint").textContent = "Landing on Midnight — proving is done; this is the network's time now.";
+    outRow("PROOF TIME", `${(proveMs / 1000).toFixed(1)}s — ${mode === "LIVE" ? "generated on this device" : "replayed from a real run; run the repo to prove live"}`);
+    $("prover-hint").textContent = mode === "LIVE"
+      ? "Landing on Midnight — proving is done; this is the network's time now."
+      : "Landing on Midnight — replaying the recorded wait; the chain reads below are live.";
     renderCredential(); // the redacted rows come back: they never left
     stopFinal = startClock();
   };
