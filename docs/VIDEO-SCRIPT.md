@@ -18,8 +18,8 @@
 | 6 | 0:52–1:02 | **FINALIZE（唯一允许加速的镜头）**：状态 SUBMITTED，提示 *Landing on Midnight*，计时器继续；落链后 ON CHAIN 块——TRANSACTION、CONTRACT、LANDED IN、SIZE 从 0 数到真实字节数、DISCLOSED VALUE ✓ | 落块一声清亮 confirm | "Landing on Midnight (sped up)" + 角标压**这一条 take 屏幕上的** tx 与合约地址前 8 位（不要用别的 take 的）。落定后："On chain: the whole transaction, proof included — the size you see is measured." |
 | 7 | 1:02–1:12 | **VERIFY**：左 ✓ VALID + LEARNED / DID NOT LEARN；右侧同屏 RAW INDEXER RESPONSE——真实无钱包查询、真实毫秒、hash / block height / 合约地址高亮 | success 尾音 | "Verified from the transaction alone, by anyone." → "The university learns the degree. Nothing else." |
 | 8 | 1:12–1:26 | **造假戏（≤15 秒）**：切到 Charles——点 *Try it with a forged diploma*，DEGREE 变成 PhD Astrophysics；点 PROVE → 约 20 ms 黄色 FAILED，三行说明（REJECTED BY your own device / REACHED THE NETWORK no / WHY） | 一声干脆的 error 音 | "Charles has no diploma. He tries anyway." → "Rejected on his own device in 20 ms. Nothing was sent." |
-| 9 | 1:26–1:40 | **三校卡**（Claude Design，已出片）：三列依次 ✓，标题 *None of them can tell.*；可切一段真实录屏的 *Prove to all three* 面板（三笔真实 tx） | 三次 ✓ 各一声 | 卡上文字即字幕。**若重出卡**，把最后一句换成：*One proof, verifiable by anyone — and it can't be used to track who applied where.*（去掉 "checked by math"） |
-| 9b | 1:40–1:52 | **收尾卡**（Claude Design，已出片）。**不提年龄** | soft 尾音 | 现有卡：*The forger is real. / He built the system that caught him.* **克制版（推荐，需重出卡）**：*Two applicants. One person. / He built the registry. Then the proof.* |
+| 9 | 1:26–1:40 | **三校卡**（Claude Design，已出片）：三列依次 ✓，标题 *None of them can tell.*；可切一段真实录屏的 *Prove to all three* 面板（三笔真实 tx） | 三次 ✓ 各一声 | 卡上文字即字幕（Charles 决定：卡照旧，不重出）。 |
+| 9b | 1:40–1:52 | **收尾卡**（Claude Design，已出片）。**不提年龄** | soft 尾音 | 卡上文字：*The forger is real. / He built the system that caught him.*（Charles 决定：卡照旧；旁白用平静的功能口吻承接，见配音稿） |
 | 10 | 1:52–2:00 | 页脚：EchoForge lockup · ALL FOR SIMPLE · 三个链接（m.echoforgeef.com · GitHub · the Cardano record） | 静 | "m.echoforgeef.com/echocert · github.com/EchoForge-Dev/EchoCert_Midnight_Demo" |
 
 ## 完整字幕稿（按时间轴，剪辑照抄）
@@ -44,7 +44,25 @@
 | 1:40 | （收尾卡自带文字） |
 | 1:52 | m.echoforgeef.com/echocert · github.com/EchoForge-Dev/EchoCert_Midnight_Demo |
 
-旁白（可选，最多两句）：镜 2 "Two applicants to the same university." · 镜 9 "Same product. One new line."
+## 配音稿（Charles 本人配音 · 功能讲解，不做宣传）
+
+原则：只解释画面上正在发生的机制，第一人称，短句。约 260 词，按 2.2–2.4 词/秒朗读正好 2 分钟。每镜单独录一条，剪辑时对齐；镜 5 的 "thirty-two bytes" 要落在字符场凝聚的那一瞬。括号里的中文是给自己看的意思对照，不读。
+
+| 镜 | 时间 | 旁白（读这个） |
+|---|---|---|
+| 1 | 0:00 | I'm Charles Tao. This is EchoCert on Midnight, built for the MLH Midnight Hackathon. （报名，资格线） |
+| 2 | 0:04 | EchoCert is my credential registry on Cardano. It works: anyone can verify a diploma. But to check one field, the registry shows all of them. （before：公开注册表，查一个字段得看全部） |
+| 3 | 0:14 | On Midnight, the credential stays on the holder's device. The chain holds only a commitment to it — a hash with a secret nonce. The ANCHOR field is the same hash as the public Cardano record. （承诺值上链；ANCHOR 与 Cardano 记录同哈希） |
+| 4 | 0:22 | The holder chooses what to prove. Four fields are redacted; they are never sent, not even encrypted. One is selected: the degree. （选择性披露） |
+| 5 | 0:36 | Now the device generates a zero-knowledge proof: a credential with this degree is in the registry, shown by a Merkle path against the tree's root, without revealing which entry. The only public input is a hash of the degree — thirty-two bytes. （ZK 证明的内容；唯一公开输入 32 字节） |
+| 6 | 0:52 | The proof goes out as a transaction. Landing takes about twenty seconds; this part is sped up. The size you see is the whole transaction, measured from the indexer. （提交与落链；字节数是实测） |
+| 7 | 1:02 | Anyone can verify it from the transaction alone — here, a plain query to the public indexer, with no wallet. The university learns the degree, and nothing else. （无钱包验证；只学到一个字段） |
+| 8 | 1:12 | And a forged diploma? Its Merkle path doesn't match the forged credential, so the circuit refuses to produce a proof. It fails on the forger's own device in twenty milliseconds. Nothing is sent. （造假在本地被拒） |
+| 9 | 1:26 | Three universities, three transactions. They share only what any two holders' proofs share: the contract, the circuit, the tree root. Nothing points back to one person. I measured that; I didn't assume it. （不可关联，实测） |
+| 9b | 1:40 | Both applicants were me. I built the public registry on Cardano, and now the private proof on Midnight. Same credential, one new path. （反转，平静地说） |
+| 10 | 1:52 | The contract, the demo and every transaction are public. Links on screen. Thank you. （收尾） |
+
+朗读提示：镜 3 和镜 5 最长，如果读不进时长，先删括号外的从句（"a hash with a secret nonce" / "shown by a Merkle path against the tree's root"），别加快语速。
 
 ## 60 秒保底版
 
