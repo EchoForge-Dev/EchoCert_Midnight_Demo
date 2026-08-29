@@ -266,6 +266,9 @@ Same asymmetry, different crash: the pre-GA devnet node rejects the zero-fee
 transaction, the GA network's wallet path panics on it. With the overhead set,
 it lands in 18.7 s.
 
+The full write-up — environment, reproduction, evidence, the misdiagnosis and
+what the SDK could do about it — is in [BUGREPORT.md](BUGREPORT.md).
+
 ---
 
 ## Repository
@@ -281,6 +284,7 @@ it lands in 18.7 s.
 | `contract/e2e/prover-service.ts` | The demo's LIVE prover |
 | `demo/` | The demo page |
 | `media/` | Screenshots and title cards used above |
+| `BUGREPORT.md` | The zero-fee finding as an upstream-ready bug report |
 | `PRIOR-WORK.md` | **What existed before the event, as the track requires — and how this moved as fast as it did** |
 
 ## Versions
