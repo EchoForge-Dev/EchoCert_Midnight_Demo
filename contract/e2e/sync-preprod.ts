@@ -77,6 +77,27 @@ const writeCkpt = (name: string, data: string) => {
   renameSync(tmp, ckptPath(name)); // atomic on the same filesystem
 };
 
+/// Serialize all three wallets to the checkpoint directory, atomically. Used
+/// by the sync loop here and, every few minutes, by a running prover — so the
+/// checkpoints stay minutes old and a restart catches up in seconds.
+let saving = false;
+export async function saveCheckpoints(facade: any, label: string): Promise<void> {
+  if (saving) return; // a slow save must never overlap the next one
+  saving = true;
+  try {
+    mkdirSync(STATE_DIR, { recursive: true });
+    const t0 = performance.now();
+    writeCkpt("shielded", await facade.shielded.serializeState());
+    writeCkpt("unshielded", await facade.unshielded.serializeState());
+    writeCkpt("dust", await facade.dust.serializeState());
+    console.log(`[sync] checkpoint (${label}) in ${(performance.now() - t0).toFixed(0)} ms`);
+  } catch (e) {
+    console.log(`[sync] checkpoint failed (${label}): ${e instanceof Error ? e.message.split("\n")[0] : e}`);
+  } finally {
+    saving = false;
+  }
+}
+
 export async function buildOrRestoreFacade(seedHex: string) {
   const seeds = WalletSeeds.fromMasterSeed(seedHex);
   const keystore = createKeystore(seeds.unshielded, "preprod");
@@ -113,22 +134,7 @@ async function main() {
   await facade.start(ZswapSecretKeys.fromSeed(seeds.shielded), DustSecretKey.fromSeed(seeds.dust));
   console.log("[sync] started; checkpointing every", CHECKPOINT_MS / 1000, "s");
 
-  let saving = false;
-  const save = async (label: string) => {
-    if (saving) return; // a slow save must never overlap the next one
-    saving = true;
-    try {
-      const t0 = performance.now();
-      writeCkpt("shielded", await (facade as any).shielded.serializeState());
-      writeCkpt("unshielded", await (facade as any).unshielded.serializeState());
-      writeCkpt("dust", await (facade as any).dust.serializeState());
-      console.log(`[sync] checkpoint (${label}) in ${(performance.now() - t0).toFixed(0)} ms`);
-    } catch (e) {
-      console.log(`[sync] checkpoint failed (${label}): ${e instanceof Error ? e.message.split("\n")[0] : e}`);
-    } finally {
-      saving = false;
-    }
-  };
+  const save = (label: string) => saveCheckpoints(facade, label);
 
   const ckptTimer = setInterval(() => void save("periodic"), CHECKPOINT_MS);
 

@@ -128,6 +128,15 @@ async function main() {
   await wallet.wallet.waitForSyncedState();
   console.log("[prover] wallet synced");
 
+  // On preprod, keep the sync checkpoints fresh while the prover runs: one
+  // save now, then every five minutes. A later restart resumes from minutes
+  // behind the tip instead of hours.
+  if (NETWORK === "preprod") {
+    const { saveCheckpoints } = await import("./sync-preprod.js");
+    await saveCheckpoints(wallet.wallet, "prover start");
+    setInterval(() => void saveCheckpoints(wallet.wallet, "prover"), 5 * 60_000);
+  }
+
   const providers: any = {
     privateStateProvider, publicDataProvider, zkConfigProvider, proofProvider,
     walletProvider: wallet, midnightProvider: wallet,
