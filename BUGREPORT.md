@@ -1,8 +1,9 @@
 # Bug report: a read-only circuit call computes a zero fee, and the wallet cannot handle it
 
 **Status:** root cause found and worked around during the MLH Midnight Hackathon
-(2026-08-28). Not yet filed upstream — this is the write-up I intend to post to the
-Midnight developer community. Everything below is reproducible from this repository.
+(2026-08-28). **Filed upstream as [midnightntwrk/midnight-wallet#700](https://github.com/midnightntwrk/midnight-wallet/issues/700)**
+(2026-08-29), cross-linked to the adjacent balancing-loop issue #438. Everything
+below is reproducible from this repository.
 
 ## Summary
 
