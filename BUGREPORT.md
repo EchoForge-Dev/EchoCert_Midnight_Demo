@@ -118,6 +118,10 @@ Any of these would have saved two days:
 3. **Document** that circuits which do not write state can compute a zero fee on
    quiet chains, and that `additionalFeeOverhead` is the knob.
 
+## Related, filed the same weekend
+
+- [input-output-hk/lace#2257](https://github.com/input-output-hk/lace/issues/2257) — the wallet-side face of the same chain: Lace 2.2.3's initial Preprod sync dies at ~99 % every cycle (relock or crash near 4 GB) and resumes from an old checkpoint, so a first-time wallet never finishes syncing. Measured in a controlled run on 2026-08-30. It is why this project went headless.
+
 ## Open question
 
 Why the GA wallet path panics where the pre-GA node merely rejects is not
