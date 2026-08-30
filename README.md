@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://m.echoforgeef.com/echocert/">Live demo</a> ·
-  <a href="https://youtu.be/lyFPPHRT_iw">Video (2:45)</a> ·
+  <a href="https://youtu.be/4r4gVs97vUo">Video (1:59)</a> ·
   <a href="PRIOR-WORK.md">Prior-work declaration</a> ·
   <a href="#the-story-the-demo-tells">The story</a> ·
   <a href="#try-it">Try it</a>
@@ -29,7 +29,7 @@ moved quickly, is set out in [PRIOR-WORK.md](PRIOR-WORK.md).
 
 **Live demo:** https://m.echoforgeef.com/echocert/ — proofs replayed from a real
 run on public preprod, chain panel live. Run the repo locally and the same page
-proves for real. **Video:** https://youtu.be/lyFPPHRT_iw — the captions are the narration; the
+proves for real. **Video:** https://youtu.be/4r4gVs97vUo — the captions are the narration; the
 proving sequence is real time, landing on chain is the one sped-up shot and says so.
 
 ---
