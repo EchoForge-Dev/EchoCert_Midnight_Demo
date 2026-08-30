@@ -29,7 +29,8 @@ import { DEFAULT_DUST_OPTIONS } from "@midnight-ntwrk/testkit-js";
 DEFAULT_DUST_OPTIONS.additionalFeeOverhead = 1_000_000n; // any positive value
 ```
 
-With that one line the identical transaction lands on both networks in ~18–19 s.
+With that one line the identical transaction lands on both networks in ~18–19 s
+(preprod: [Subscan extrinsic 2306120-3](https://midnight-preprod.subscan.io/extrinsic/2306120-3), Result: Success).
 
 ## Environment
 

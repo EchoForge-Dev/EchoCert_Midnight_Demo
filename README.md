@@ -206,7 +206,11 @@ The same pipeline, against the public preprod network, 2026-08-28:
 Contract `4719d2f6ebcddbda079ac07ec1cc7ea4019471ba254ca1846461c8e204d0769b` ·
 issue tx `00f9dba9…ba10a51` · proveDegree tx `00eb3b27…d583ab`. Query the public
 indexer yourself: `contractAction(address)` at
-`https://indexer.preprod.midnight.network/api/v4/graphql`.
+`https://indexer.preprod.midnight.network/api/v4/graphql` — or open the proof on
+a block explorer: [Subscan extrinsic 2306120-3](https://midnight-preprod.subscan.io/extrinsic/2306120-3) (`Midnight (Send_mn_transaction)`,
+Result: Success, in [block 2306120](https://midnight-preprod.subscan.io/block/2306120)). The indexer's transaction `hash`
+is the Midnight ledger hash, not the Substrate extrinsic hash; the explorer's
+block page lists the `send_mn_transaction` row.
 
 Getting there took a checkpoint-and-restore wallet sync
 (`contract/e2e/sync-preprod.ts`) — a cold sync of the public chain no longer
